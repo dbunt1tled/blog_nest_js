@@ -13,38 +13,44 @@ import { SignUp } from './dto/sign-up';
 import { Request, Response } from 'express';
 import { Tokens } from './dto/tokens';
 import { AuthGuard } from '@nestjs/passport';
+import {
+  AccessGuard,
+  CurrentUser,
+  CurrentUserId,
+  Public,
+  RefreshGuard,
+} from './decorators';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('signup')
+  @Public()
   async signup(@Body() auth: SignUp, @Res() res: Response) {
     await this.authService.signup(auth);
     res.status(HttpStatus.OK).json({}).send();
   }
-
   @Post('login')
+  @Public()
   async login(@Body() auth: Auth, @Res() res: Response) {
     const tokens: Tokens = await this.authService.login(auth);
     res.status(HttpStatus.OK).json(tokens).send();
   }
 
   @Post('logout')
-  @UseGuards(AuthGuard('jwt'))
-  async logout(@Req() req: Request, @Res() res: Response) {
-    const user = req.user;
-    console.log(user);
-    await this.authService.logout(user['sub']);
+  @UseGuards(AccessGuard)
+  async logout(@CurrentUserId() userId: number, @Res() res: Response) {
+    await this.authService.logout(userId);
     res.status(HttpStatus.OK).json({}).send();
   }
 
   @Post('refresh')
-  @UseGuards(AuthGuard('jwt-refresh'))
-  async refresh(@Req() req: Request, @Res() res: Response) {
-    const user = req.user;
-    console.log(user);
-    const tokens: Tokens = await this.authService.refresh(user['sub']);
+  @Public()
+  @UseGuards(RefreshGuard)
+  async refresh(@CurrentUserId() userId: number, @Res() res: Response) {
+    console.log(userId);
+    const tokens: Tokens = await this.authService.refresh(userId);
     res.status(HttpStatus.OK).json(tokens).send();
   }
 }
