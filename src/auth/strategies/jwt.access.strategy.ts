@@ -1,9 +1,13 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { jwtConstants } from '../constants';
+import { JwtPayload } from './jwt.payload';
+import { UserService } from '../../user/user.service';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 
+@Injectable()
 export class JwtAccessStrategy extends PassportStrategy(Strategy, 'jwt') {
-  constructor() {
+  constructor(private userService: UserService) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
@@ -11,7 +15,11 @@ export class JwtAccessStrategy extends PassportStrategy(Strategy, 'jwt') {
     });
   }
 
-  async validate(payload: any) {
+  async validate(payload: JwtPayload) {
+    const user = await this.userService.getById(payload.sub);
+    if (user.hashRt !== payload.session) {
+      throw new ForbiddenException('Access denied.');
+    }
     return payload;
   }
 }

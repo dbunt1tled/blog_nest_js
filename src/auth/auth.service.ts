@@ -8,7 +8,7 @@ import { Tokens } from './dto/tokens';
 import { JwtService } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
 import { UserFilter } from '../user/user.filter';
-import { User } from '@prisma/client';
+import { uid } from 'uid';
 
 @Injectable()
 export class AuthService {
@@ -21,13 +21,17 @@ export class AuthService {
     return bcrypt.hash(password, 10);
   }
 
-  async tokens(userId: number, email: string): Promise<Tokens> {
-
+  async tokens(
+    userId: number,
+    email: string,
+    session: string,
+  ): Promise<Tokens> {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
         {
           sub: userId,
           email: email,
+          session: session,
         },
         {
           expiresIn: 60 * 30,
@@ -38,6 +42,7 @@ export class AuthService {
         {
           sub: userId,
           email: email,
+          session: session,
         },
         {
           expiresIn: 60 * 60 * 24 * 30,
@@ -48,7 +53,7 @@ export class AuthService {
     return { accessToken: accessToken, refreshToken: refreshToken };
   }
 
-  async signup(auth: SignUp){
+  async signup(auth: SignUp) {
     const hash = await this.hashPassword(auth.password);
     const user = await this.userService.create({
       name: auth.name,
@@ -69,15 +74,31 @@ export class AuthService {
     if (!compare) {
       throw new ForbiddenException('User password mismatch');
     }
-    const tokens = await this.tokens(user.id, user.email);
+    const session = uid(21);
+    const tokens = await this.tokens(user.id, user.email, session);
     await this.userService.update({
       userId: user.id,
-      hashRt: tokens.refreshToken,
+      hashRt: session,
     });
+
     return tokens;
   }
 
-  logout(){}
+  async logout(userId: number) {
+    await this.userService.update({
+      userId: userId,
+      hashRt: uid(21),
+    });
+  }
 
-  refresh(){}
+  async refresh(userId: number): Promise<Tokens> {
+    const user = await this.userService.getById(userId);
+    const session = uid(21);
+    const tokens = await this.tokens(user.id, user.email, session);
+    await this.userService.update({
+      userId: userId,
+      hashRt: session,
+    });
+    return tokens;
+  }
 }

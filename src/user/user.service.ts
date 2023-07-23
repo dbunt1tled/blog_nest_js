@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ORMService } from '../connectors/o-r-m.service';
 import { UserFilter } from './user.filter';
-import { User } from '@prisma/client';
 import { UserUpdate } from './dto/UserUpdate';
 import { UserCreate } from './dto/UserCreate';
 
@@ -20,7 +19,6 @@ export class UserService {
   }
 
   update(user: UserUpdate) {
-    console.log(user);
     return this.ormService.user.update({
       where: {
         id: user.userId,
