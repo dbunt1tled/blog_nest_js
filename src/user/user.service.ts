@@ -1,14 +1,15 @@
-import { Injectable } from '@nestjs/common';
-import { ORMService } from '../connectors/o-r-m.service';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { ORMService } from '../connectors/orm/o-r-m.service';
 import { UserFilter } from './user.filter';
 import { UserUpdate } from './dto/UserUpdate';
 import { UserCreate } from './dto/UserCreate';
+import { UserI } from './interfaces/user.interface';
 
 @Injectable()
 export class UserService {
   constructor(private readonly ormService: ORMService) {}
-  create(user: UserCreate) {
-    return this.ormService.user.create({
+  create(user: UserCreate): Promise<UserI> {
+    return <Promise<UserI>>this.ormService.user.create({
       data: {
         name: user.name,
         email: user.email,
@@ -18,8 +19,8 @@ export class UserService {
     });
   }
 
-  update(user: UserUpdate) {
-    return this.ormService.user.update({
+  update(user: UserUpdate): Promise<UserI> {
+    return <Promise<UserI>>this.ormService.user.update({
       where: {
         id: user.userId,
       },
@@ -32,22 +33,28 @@ export class UserService {
     });
   }
 
-  findById(id: number) {
-    return this.ormService.user.findFirst({
+  findById(id: number): Promise<UserI | null> {
+    return <Promise<UserI | null>>this.ormService.user.findFirst({
       where: { id: id },
     });
   }
-  getById(id: number) {
-    return this.ormService.user.findFirstOrThrow({
-      where: { id: id },
-    });
+  getById(id: number): Promise<UserI> {
+    return <Promise<UserI>>this.ormService.user
+      .findUniqueOrThrow({
+        where: { id: id },
+      })
+      .catch(() => {
+        throw new NotFoundException('User not found');
+      });
   }
 
   one(filter: UserFilter) {
-    return this.ormService.user.findFirst(filter.build());
+    return <Promise<UserI | null>>(
+      this.ormService.user.findFirst(filter.build())
+    );
   }
 
   list(filter: UserFilter) {
-    return this.ormService.user.findMany(filter.build());
+    return <Promise<UserI[] | []>>this.ormService.user.findMany(filter.build());
   }
 }

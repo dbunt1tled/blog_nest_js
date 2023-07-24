@@ -1,33 +1,30 @@
 import { isArray } from 'class-validator';
+import { UserFilterI } from './interfaces/user.filter.interface';
 
 export class UserFilter {
-  id?: number | number[];
-  email?: string;
-  name?: string;
-  emailSearch?: string;
-  nameSearch?: string;
+  constructor(private readonly filter: UserFilterI) {}
 
   build() {
     let nameFilter = undefined;
-    if (this.name !== undefined) {
-      nameFilter = this.name;
-    } else if (this.nameSearch !== null) {
-      nameFilter = { contains: this.nameSearch };
+    if (this.filter.name !== undefined) {
+      nameFilter = this.filter.name;
+    } else if (this.filter.nameSearch !== null) {
+      nameFilter = { contains: this.filter.nameSearch };
     }
 
     let emailFilter = undefined;
-    if (this.email !== undefined) {
-      emailFilter = this.email;
-    } else if (this.emailSearch !== null) {
-      emailFilter = { contains: this.emailSearch };
+    if (this.filter.email !== undefined) {
+      emailFilter = this.filter.email;
+    } else if (this.filter.emailSearch !== null) {
+      emailFilter = { contains: this.filter.emailSearch };
     }
 
     let idFilter = undefined;
-    if (this.id !== undefined) {
-      if (isArray(this.id)) {
-        idFilter = { in: this.id };
+    if (this.filter.id !== undefined) {
+      if (isArray(this.filter.id)) {
+        idFilter = { in: this.filter.id };
       } else {
-        idFilter = this.id;
+        idFilter = this.filter.id;
       }
     }
 

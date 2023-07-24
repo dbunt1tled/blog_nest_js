@@ -12,11 +12,13 @@ datasource db {
 
 model User {
   id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
+  email String  @unique @db.VarChar(200)
+  name  String? @db.VarChar(200)
+  status Int @default(1)
   posts Post[]
-  hash  String
-  hashRt  String?
+  hash  String @db.VarChar(200)
+  hashRt  String? @db.VarChar(200)
+  confirmedAt DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -26,8 +28,8 @@ model User {
 
 model Post {
   id        Int     @id @default(autoincrement())
-  title     String
-  content   String?
+  title     String @db.VarChar(200)
+  content   String? @db.VarChar(200)
   published Boolean @default(false)
   author    User    @relation(fields: [authorId], references: [id])
   authorId  Int

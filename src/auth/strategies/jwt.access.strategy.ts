@@ -17,6 +17,9 @@ export class JwtAccessStrategy extends PassportStrategy(Strategy, 'jwt') {
 
   async validate(payload: JwtPayload) {
     const user = await this.userService.getById(payload.sub);
+    if (user.status === 2) {
+      throw new ForbiddenException('Access denied. Please confirm your email');
+    }
     if (user.hashRt !== payload.session) {
       throw new ForbiddenException('Access denied.');
     }

@@ -3,23 +3,15 @@ import {
   Controller,
   HttpStatus,
   Post,
-  Req,
   Res,
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Auth } from './dto/auth';
 import { SignUp } from './dto/sign-up';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { Tokens } from './dto/tokens';
-import { AuthGuard } from '@nestjs/passport';
-import {
-  AccessGuard,
-  CurrentUser,
-  CurrentUserId,
-  Public,
-  RefreshGuard,
-} from './decorators';
+import { AccessGuard, CurrentUserId, Public, RefreshGuard } from './decorators';
 
 @Controller('auth')
 export class AuthController {
