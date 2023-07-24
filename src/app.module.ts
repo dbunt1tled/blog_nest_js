@@ -7,11 +7,11 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { ORMModule } from './connectors/orm/o-r-m.module';
 import { AccessGuard } from './auth/decorators';
-import { MailerModule } from '@nestjs-modules/mailer';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { getMailConfig } from './connectors/mail/mail.config';
 import { MailModule } from './connectors/mail/mail.module';
-
+import { AcceptLanguageResolver, HeaderResolver, I18nModule, QueryResolver } from 'nestjs-i18n';
+import * as path from 'path';
+console.log(path.join(__dirname, '/i18n/'));
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -21,6 +21,18 @@ import { MailModule } from './connectors/mail/mail.module';
     UserModule,
     ORMModule,
     MailModule,
+    I18nModule.forRoot({
+      fallbackLanguage: 'en',
+      loaderOptions: {
+        path: path.join(__dirname, '/i18n/'),
+        watch: true,
+      },
+      resolvers: [
+        new QueryResolver(["lang", "l"]),
+        new HeaderResolver(["x-custom-lang"]),
+        AcceptLanguageResolver,
+      ],
+    }),
   ],
   controllers: [MainController],
   providers: [

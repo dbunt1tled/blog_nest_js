@@ -4,10 +4,15 @@ import { jwtConstants } from '../constants';
 import { JwtPayload } from './jwt.payload';
 import { UserService } from '../../user/user.service';
 import { ForbiddenException, Injectable } from '@nestjs/common';
+import { TokenType } from './token.type';
+import { I18nContext, I18nService } from 'nestjs-i18n';
 
 @Injectable()
 export class JwtAccessStrategy extends PassportStrategy(Strategy, 'jwt') {
-  constructor(private userService: UserService) {
+  constructor(
+    private userService: UserService,
+    private readonly i18nService: I18nService,
+  ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
@@ -20,8 +25,12 @@ export class JwtAccessStrategy extends PassportStrategy(Strategy, 'jwt') {
     if (user.status === 2) {
       throw new ForbiddenException('Access denied. Please confirm your email');
     }
-    if (user.hashRt !== payload.session) {
-      throw new ForbiddenException('Access denied.');
+    if (payload.type === TokenType.ACCESS && user.hashRt !== payload.session) {
+      throw new ForbiddenException(
+        this.i18nService.t('app.alert.access_denied', {
+          lang: I18nContext.current().lang,
+        }),
+      );
     }
     return payload;
   }

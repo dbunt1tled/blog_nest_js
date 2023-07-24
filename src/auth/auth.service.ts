@@ -1,8 +1,9 @@
 import {
   ForbiddenException,
+  Global,
   Injectable,
   NotFoundException,
-  UnprocessableEntityException,
+  UnprocessableEntityException
 } from '@nestjs/common';
 import { SignUp } from './dto/sign-up';
 import { Auth } from './dto/auth';
@@ -13,14 +14,18 @@ import { JwtService } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
 import { UserFilter } from '../user/user.filter';
 import { uid } from 'uid';
-import { MailService } from '../connectors/mail/mail.service';
+import { I18nContext, I18nService } from 'nestjs-i18n';
+import { TokenType } from './strategies/token.type';
+import { JwtPayload } from './strategies/jwt.payload';
+import { UserStatus } from '../user/enums/user.status';
 
+@Global()
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
-    private readonly mailService: MailService,
+    private readonly i18n: I18nService,
   ) {}
 
   hashPassword(password: string) {
@@ -37,6 +42,7 @@ export class AuthService {
         {
           sub: userId,
           email: email,
+          type: TokenType.ACCESS,
           session: session,
         },
         {
@@ -48,6 +54,7 @@ export class AuthService {
         {
           sub: userId,
           email: email,
+          type: TokenType.REFRESH,
           session: session,
         },
         {
@@ -65,17 +72,17 @@ export class AuthService {
     );
     if (userExist) {
       throw new UnprocessableEntityException(
-        `User with email ${auth.email} already exists`,
+        this.i18n.t('app.user_email_exists',{ args: { email: auth.email }, lang:   I18nContext.current().lang })
       );
     }
     const hash = await this.hashPassword(auth.password);
-    const user = await this.userService.create({
+    return this.userService.create({
       name: auth.name,
       email: auth.email,
+      status: UserStatus.PENDING,
       hash: hash,
+      hashRt: uid(21),
     });
-    await this.mailService.sendConfirmationEmail(user.id);
-    return user;
   }
 
   async login(auth: Auth): Promise<Tokens> {
@@ -115,5 +122,30 @@ export class AuthService {
       hashRt: session,
     });
     return tokens;
+  }
+
+  async confirmToken(userId: number) {
+    const user = await this.userService.getById(userId);
+    return this.jwtService.signAsync(
+      {
+        sub: user.id,
+        email: user.email,
+        type: TokenType.CONFIRM_EMAIL,
+        session: user.hashRt,
+      },
+      {
+        expiresIn: '1d',
+        secret: jwtConstants.secretAccess,
+      },
+    );
+  }
+
+  decodeToken(token: string, checkExpiry = true): JwtPayload {
+    if (!checkExpiry) {
+      const base64Payload = token.split('.')[1];
+      const payloadBuffer = Buffer.from(base64Payload, 'base64');
+      return JSON.parse(payloadBuffer.toString()) as JwtPayload;
+    }
+    return <JwtPayload>this.jwtService.decode(token);
   }
 }

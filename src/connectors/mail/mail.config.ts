@@ -1,8 +1,10 @@
 import { ConfigService } from '@nestjs/config';
-import { EjsAdapter } from '@nestjs-modules/mailer/dist/adapters/ejs.adapter';
+import { I18nService } from 'nestjs-i18n';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 
 export const getMailConfig = async (
   configService: ConfigService,
+  i18n: I18nService,
 ): Promise<any> => {
   const transport = configService.get<string>('MAIL_TRANSPORT');
   const mailFromName = configService.get<string>('MAIL_FROM_NAME');
@@ -14,7 +16,7 @@ export const getMailConfig = async (
       from: `"${mailFromName}" <${mailFromAddress}>`,
     },
     template: {
-      adapter: new EjsAdapter(),
+      adapter: new HandlebarsAdapter({ t: i18n.hbsHelper }),
       options: {
         strict: false,
       },

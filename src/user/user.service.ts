@@ -13,8 +13,10 @@ export class UserService {
       data: {
         name: user.name,
         email: user.email,
+        status: user.status,
         hash: user.hash,
         hashRt: user.hashRt,
+        confirmedAt: user.confirmedAt,
       },
     });
   }
@@ -27,8 +29,10 @@ export class UserService {
       data: {
         name: user.name,
         email: user.email,
+        status: user.status,
         hash: user.hash,
         hashRt: user.hashRt,
+        confirmedAt: user.confirmedAt,
       },
     });
   }

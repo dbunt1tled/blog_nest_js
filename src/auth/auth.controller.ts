@@ -1,9 +1,12 @@
 import {
   Body,
   Controller,
+  Get,
   HttpStatus,
+  Param,
   Post,
   Res,
+  UnprocessableEntityException,
   UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
@@ -12,16 +15,52 @@ import { SignUp } from './dto/sign-up';
 import { Response } from 'express';
 import { Tokens } from './dto/tokens';
 import { AccessGuard, CurrentUserId, Public, RefreshGuard } from './decorators';
+import { UserService } from '../user/user.service';
+import { UserStatus } from '../user/enums/user.status';
+import { I18nContext, I18nService } from 'nestjs-i18n';
+import { MailService } from '../connectors/mail/mail.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly userService: UserService,
+    private readonly i18nService: I18nService,
+    private readonly mailService: MailService,
+  ) {}
+  @Get('confirm-email/:token')
+  @Public()
+  async confirmEmail(@Param('token') token: string, @Res() res: Response) {
+    console.log(token);
+    const jwtPayload = this.authService.decodeToken(token);
+    const user = await this.userService.findById(jwtPayload.sub);
+    if (
+      !user ||
+      user.hashRt !== jwtPayload.session ||
+      user.status !== UserStatus.PENDING
+    ) {
+      throw new UnprocessableEntityException(
+        this.i18nService.t('app.alert.confirmation_alert', {
+          lang: I18nContext.current().lang,
+        }),
+      );
+    }
+    await this.userService.update({
+      userId: user.id,
+      status: UserStatus.ACTIVE,
+      confirmedAt: new Date(),
+      hashRt: null,
+    });
+    res.status(HttpStatus.OK).json().send();
+  }
 
   @Post('signup')
   @Public()
   async signup(@Body() auth: SignUp, @Res() res: Response) {
-    await this.authService.signup(auth);
-    res.status(HttpStatus.OK).json({}).send();
+    const user = await this.authService.signup(auth);
+    const token = await this.authService.confirmToken(user.id);
+    await this.mailService.sendConfirmationEmail(user.id, token);
+    res.status(HttpStatus.OK).json().send();
   }
   @Post('login')
   @Public()
@@ -34,14 +73,13 @@ export class AuthController {
   @UseGuards(AccessGuard)
   async logout(@CurrentUserId() userId: number, @Res() res: Response) {
     await this.authService.logout(userId);
-    res.status(HttpStatus.OK).json({}).send();
+    res.status(HttpStatus.OK).json().send();
   }
 
   @Post('refresh')
   @Public()
   @UseGuards(RefreshGuard)
   async refresh(@CurrentUserId() userId: number, @Res() res: Response) {
-    console.log(userId);
     const tokens: Tokens = await this.authService.refresh(userId);
     res.status(HttpStatus.OK).json(tokens).send();
   }
