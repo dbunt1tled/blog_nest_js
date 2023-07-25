@@ -3,7 +3,7 @@ import {
   Global,
   Injectable,
   NotFoundException,
-  UnprocessableEntityException
+  UnprocessableEntityException,
 } from '@nestjs/common';
 import { SignUp } from './dto/sign-up';
 import { Auth } from './dto/auth';
@@ -67,12 +67,15 @@ export class AuthService {
   }
 
   async signup(auth: SignUp) {
-    const userExist = await this.userService.one(
+    const user = await this.userService.one(
       new UserFilter({ email: auth.email }),
     );
-    if (userExist) {
+    if (user) {
       throw new UnprocessableEntityException(
-        this.i18n.t('app.user_email_exists',{ args: { email: auth.email }, lang:   I18nContext.current().lang })
+        this.i18n.t('app.alert.user_email_exists', {
+          args: { email: auth.email },
+          lang: I18nContext.current().lang,
+        }),
       );
     }
     const hash = await this.hashPassword(auth.password);
@@ -90,11 +93,19 @@ export class AuthService {
       new UserFilter({ email: auth.email }),
     );
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException(
+        this.i18n.t('app.alert.user_not_found', {
+          lang: I18nContext.current().lang,
+        }),
+      );
     }
     const compare: boolean = await bcrypt.compare(auth.password, user.hash);
     if (!compare) {
-      throw new ForbiddenException('User password mismatch');
+      throw new ForbiddenException(
+        this.i18n.t('app.alert.user_password_mismatch', {
+          lang: I18nContext.current().lang,
+        }),
+      );
     }
     const session = uid(21);
     const tokens = await this.tokens(user.id, user.email, session);
@@ -142,10 +153,25 @@ export class AuthService {
 
   decodeToken(token: string, checkExpiry = true): JwtPayload {
     if (!checkExpiry) {
-      const base64Payload = token.split('.')[1];
-      const payloadBuffer = Buffer.from(base64Payload, 'base64');
-      return JSON.parse(payloadBuffer.toString()) as JwtPayload;
+      const t = <JwtPayload | null>this.jwtService.decode(token);
+      if (t === null) {
+        throw new UnprocessableEntityException(
+          this.i18n.t('app.alert.token_invalid', {
+            lang: I18nContext.current().lang,
+          }),
+        );
+      }
     }
-    return <JwtPayload>this.jwtService.decode(token);
+    try {
+      return this.jwtService.verify(token, {
+        secret: jwtConstants.secretAccess,
+      });
+    } catch (e) {
+      throw new UnprocessableEntityException(
+        this.i18n.t(`app.alert.${e.message}`, {
+          lang: I18nContext.current().lang,
+        }),
+      );
+    }
   }
 }

@@ -19,41 +19,17 @@ import { UserService } from '../user/user.service';
 import { UserStatus } from '../user/enums/user.status';
 import { I18nContext, I18nService } from 'nestjs-i18n';
 import { MailService } from '../connectors/mail/mail.service';
+import { EmailConfirmResend } from './dto/emailConfirmResend';
+import { UserFilter } from '../user/user.filter';
 
 @Controller('auth')
 export class AuthController {
   constructor(
+    private readonly i18n: I18nService,
     private readonly authService: AuthService,
     private readonly userService: UserService,
-    private readonly i18nService: I18nService,
     private readonly mailService: MailService,
   ) {}
-  @Get('confirm-email/:token')
-  @Public()
-  async confirmEmail(@Param('token') token: string, @Res() res: Response) {
-    console.log(token);
-    const jwtPayload = this.authService.decodeToken(token);
-    const user = await this.userService.findById(jwtPayload.sub);
-    if (
-      !user ||
-      user.hashRt !== jwtPayload.session ||
-      user.status !== UserStatus.PENDING
-    ) {
-      throw new UnprocessableEntityException(
-        this.i18nService.t('app.alert.confirmation_alert', {
-          lang: I18nContext.current().lang,
-        }),
-      );
-    }
-    await this.userService.update({
-      userId: user.id,
-      status: UserStatus.ACTIVE,
-      confirmedAt: new Date(),
-      hashRt: null,
-    });
-    res.status(HttpStatus.OK).json().send();
-  }
-
   @Post('signup')
   @Public()
   async signup(@Body() auth: SignUp, @Res() res: Response) {
@@ -82,5 +58,57 @@ export class AuthController {
   async refresh(@CurrentUserId() userId: number, @Res() res: Response) {
     const tokens: Tokens = await this.authService.refresh(userId);
     res.status(HttpStatus.OK).json(tokens).send();
+  }
+
+  @Get('confirm-email/:token')
+  @Public()
+  async confirmEmail(@Param('token') token: string, @Res() res: Response) {
+    const jwtPayload = this.authService.decodeToken(token);
+    const user = await this.userService.findById(jwtPayload.sub);
+    if (
+      !user ||
+      user.hashRt !== jwtPayload.session ||
+      user.status !== UserStatus.PENDING
+    ) {
+      throw new UnprocessableEntityException(
+        this.i18n.t('app.alert.confirmation_alert', {
+          lang: I18nContext.current().lang,
+        }),
+      );
+    }
+    await this.userService.update({
+      userId: user.id,
+      status: UserStatus.ACTIVE,
+      confirmedAt: new Date(),
+      hashRt: null,
+    });
+    res.status(HttpStatus.OK).json().send();
+  }
+
+  @Post('confirm-email-resend')
+  @Public()
+  async confirmEmailResend(@Body() email: EmailConfirmResend, @Res() res: Response) {
+    const user = await this.userService.one(
+      new UserFilter({ email: email.email }),
+    );
+    if (!user) {
+      throw new UnprocessableEntityException(
+        this.i18n.t('app.alert.user_email_not_exists', {
+          args: { email: email.email },
+          lang: I18nContext.current().lang,
+        }),
+      );
+    }
+    if (user.status !== UserStatus.PENDING) {
+      throw new UnprocessableEntityException(
+        this.i18n.t('app.alert.user_email_confirmed', {
+          args: { email: email.email },
+          lang: I18nContext.current().lang,
+        }),
+      );
+    }
+    const token = await this.authService.confirmToken(user.id);
+    await this.mailService.sendConfirmationEmail(user.id, token);
+    res.status(HttpStatus.OK).json().send();
   }
 }

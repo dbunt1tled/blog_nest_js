@@ -1,5 +1,4 @@
 {
-  "user_email_exists": "User with email {email} already exists",
   "mail": {
     "hello_username": "Hello {username}.",
     "confirmation_email": "Confirmation Email",
@@ -7,8 +6,16 @@
     "confirm_line_2": "To complete registration click to link"
   },
   "alert": {
+    "user_email_exists": "User with email {email} already exists",
+    "user_email_not_exists": "User with email {email} not exists",
+    "user_email_confirmed": "User with email {email} already confirmed",
     "access_denied": "Access denied.",
-    "confirmation_alert": "Token Expired or Invalid or user already confirmed email."
+    "confirmation_alert": "Token expired or invalid or user already confirmed email.",
+    "token_invalid": "Token expired or invalid",
+    "invalid token": "Token invalid or expired",
+    "jwt expired": "Token expired or invalid",
+    "user_not_found": "User not found",
+    "user_password_mismatch": "User password mismatch"
   },
   "ENGLISH": "English",
   "ARRAY": ["ONE", "TWO", "THREE"],

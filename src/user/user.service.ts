@@ -4,10 +4,14 @@ import { UserFilter } from './user.filter';
 import { UserUpdate } from './dto/UserUpdate';
 import { UserCreate } from './dto/UserCreate';
 import { UserI } from './interfaces/user.interface';
+import { I18nContext, I18nService } from 'nestjs-i18n';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly ormService: ORMService) {}
+  constructor(
+    private readonly i18n: I18nService,
+    private readonly ormService: ORMService,
+  ) {}
   create(user: UserCreate): Promise<UserI> {
     return <Promise<UserI>>this.ormService.user.create({
       data: {
@@ -48,7 +52,11 @@ export class UserService {
         where: { id: id },
       })
       .catch(() => {
-        throw new NotFoundException('User not found');
+        throw new NotFoundException(
+          this.i18n.t('app.alert.user_not_found', {
+            lang: I18nContext.current().lang,
+          }),
+        );
       });
   }
 

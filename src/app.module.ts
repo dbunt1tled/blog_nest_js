@@ -11,7 +11,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MailModule } from './connectors/mail/mail.module';
 import { AcceptLanguageResolver, HeaderResolver, I18nModule, QueryResolver } from 'nestjs-i18n';
 import * as path from 'path';
-console.log(path.join(__dirname, '/i18n/'));
+
 @Module({
   imports: [
     ConfigModule.forRoot({
