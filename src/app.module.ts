@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppService } from './app.service';
 import { MainController } from './http/controllers/main';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
-import { ExceptionHandler } from './http/handler';
+import { ExceptionHandler } from './handler';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { ORMModule } from './connectors/orm/o-r-m.module';
