@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { AccessGuard } from './auth/decorators';
 import { I18nValidationExceptionFilter, I18nValidationPipe } from 'nestjs-i18n';
+import { useContainer } from 'class-validator';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -15,18 +16,21 @@ async function bootstrap() {
       whitelist: true,
     }),
   );
-  app.useGlobalPipes(
-    new I18nValidationPipe())
+  useContainer(app.select(AppModule), { fallbackOnErrors: true });
+  app.useGlobalPipes(new I18nValidationPipe());
 
-  app.useGlobalFilters(new I18nValidationExceptionFilter({
+  app.useGlobalFilters(
+    new I18nValidationExceptionFilter({
       detailedErrors: false,
-  }))
+    }),
+  );
+
   await app.listen(3000);
   const server = app.getHttpServer();
   const router = server._events.request._router;
 
   const availableRoutes: [] = router.stack
-    .map(layer => {
+    .map((layer) => {
       if (layer.route) {
         return {
           route: {
@@ -36,7 +40,7 @@ async function bootstrap() {
         };
       }
     })
-    .filter(item => item !== undefined);
+    .filter((item) => item !== undefined);
   console.log(availableRoutes);
 }
 bootstrap();

@@ -30,10 +30,6 @@ export class AuthService {
     private readonly i18n: I18nService,
   ) {}
 
-  hashPassword(password: string) {
-    return argon2.hash(password);
-  }
-
   async tokens(user: UserI): Promise<Tokens> {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
@@ -78,7 +74,7 @@ export class AuthService {
         }),
       );
     }
-    const hash = await this.hashPassword(auth.password);
+    const hash = await argon2.hash(auth.password);
     return this.userService.create({
       name: auth.name,
       email: auth.email,

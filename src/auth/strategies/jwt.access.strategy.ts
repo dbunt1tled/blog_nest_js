@@ -23,9 +23,6 @@ export class JwtAccessStrategy extends PassportStrategy(Strategy, 'jwt') {
 
   async validate(payload: JwtPayload) {
     const user = await this.userService.getById(payload.sub);
-    console.log(user);
-    console.log(payload);
-
     if (
       user.status !== UserStatus.ACTIVE ||
       payload.type !== TokenType.ACCESS ||
