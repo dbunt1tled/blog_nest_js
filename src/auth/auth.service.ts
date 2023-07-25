@@ -8,6 +8,7 @@ import {
 import { SignUp } from './dto/sign-up';
 import { Auth } from './dto/auth';
 import * as bcrypt from 'bcrypt';
+import * as argon2 from 'argon2';
 import { UserService } from '../user/user.service';
 import { Tokens } from './dto/tokens';
 import { JwtService } from '@nestjs/jwt';
@@ -29,7 +30,7 @@ export class AuthService {
   ) {}
 
   hashPassword(password: string) {
-    return bcrypt.hash(password, 10);
+    return argon2.hash(password);
   }
 
   async tokens(
@@ -99,7 +100,7 @@ export class AuthService {
         }),
       );
     }
-    const compare: boolean = await bcrypt.compare(auth.password, user.hash);
+    const compare: boolean = await argon2.verify(user.hash, auth.password);
     if (!compare) {
       throw new ForbiddenException(
         this.i18n.t('app.alert.user_password_mismatch', {

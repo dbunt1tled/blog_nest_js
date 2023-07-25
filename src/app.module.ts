@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { AppService } from './app.service';
-import { MainController } from './http/controllers/main';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { ExceptionHandler } from './handler';
 import { AuthModule } from './auth/auth.module';
@@ -34,7 +33,7 @@ import * as path from 'path';
       ],
     }),
   ],
-  controllers: [MainController],
+  controllers: [],
   providers: [
     AppService,
     {
