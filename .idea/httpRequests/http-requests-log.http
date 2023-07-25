@@ -1,3 +1,64 @@
+POST http://localhost:3000/auth/logout
+Accept: application/json
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIxLCJlbWFpbCI6ImRlbi5wYXJ0ZWQxODRAYWxlZWFzLmNvbSIsInR5cGUiOiJhY2Nlc3MiLCJzZXNzaW9uIjoiODJlZmZmYTE5MmQ0M2FhMDYyZDYzIiwiaWF0IjoxNjkwMjY1NzMyLCJleHAiOjE2OTAyNjc1MzJ9.DFvfZkBSL6K8x1BFA8kkjNnu4H9w42xewcGvRIqKb9g
+Content-Length: 0
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+###
+
+POST http://localhost:3000/auth/refresh
+Accept: application/json
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIxLCJlbWFpbCI6ImRlbi5wYXJ0ZWQxODRAYWxlZWFzLmNvbSIsInR5cGUiOiJyZWZyZXNoIiwic2Vzc2lvbiI6IjI4MmVmZmZhMTkyZDQzYWEwNjJkNiIsImlhdCI6MTY5MDI2NTcyNywiZXhwIjoxNjkyODU3NzI3fQ.LzC1oGxxCzhnycUj46mJlKKXgbXmYy-SAqmzQh6E2lU
+Content-Length: 0
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+<> 2023-07-25T091532.200.json
+
+###
+
+POST http://localhost:3000/auth/login
+Accept: application/json
+Content-Type: application/json
+Accept: application/json
+Content-Length: 68
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "password": "12345Test",
+  "email": "den.parted184@aleeas.com"
+}
+
+<> 2023-07-25T091527.200.json
+
+###
+
+POST http://localhost:3000/auth/signup
+Accept: application/json
+Content-Type: application/json
+Accept: application/json
+Content-Length: 87
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "name": "denis",
+  "password": "12345Test",
+  "email": "den.parted184@aleeas.com"
+}
+
+###
+
 GET http://localhost:3000/auth/confirm-email/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjE0LCJlbWFpbCI6ImRlbi5wYXJ0ZWQxODRAYWxlZWFzLmNvbSIsInR5cGUiOiJjb25maXJtX2VtYWlsIiwic2Vzc2lvbiI6ImFiMWE3ZjM5ZTFkM2IxM2M0NzRjYyIsImlhdCI6MTY5MDIyNTQyNSwiZXhwIjoxNjkwMzExODI1fQ.qxmljvYS0bNRLvU4bvszrZFmHVgqksGSkRCcqy-UNMk
 Accept: application/json
 Content-Type: application/json
@@ -708,78 +769,6 @@ Accept-Encoding: br,deflate,gzip,x-gzip
 }
 
 <> 2023-07-24T105259.200.json
-
-###
-
-POST http://localhost:3000/auth/login
-Accept: application/json
-Content-Type: application/json
-Accept: application/json
-Content-Length: 68
-Connection: Keep-Alive
-User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
-Accept-Encoding: br,deflate,gzip,x-gzip
-
-{
-  "password": "12345Test",
-  "email": "den.parted184@aleeas.com"
-}
-
-<> 2023-07-24T103751.200.json
-
-###
-
-POST http://localhost:3000/auth/login
-Accept: application/json
-Content-Type: application/json
-Accept: application/json
-Content-Length: 68
-Connection: Keep-Alive
-User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
-Accept-Encoding: br,deflate,gzip,x-gzip
-
-{
-  "password": "12345Test",
-  "email": "den.parted184@aleeas.com"
-}
-
-<> 2023-07-24T103511.200.json
-
-###
-
-POST http://localhost:3000/auth/login
-Accept: application/json
-Content-Type: application/json
-Accept: application/json
-Content-Length: 68
-Connection: Keep-Alive
-User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
-Accept-Encoding: br,deflate,gzip,x-gzip
-
-{
-  "password": "12345Test",
-  "email": "den.parted184@aleeas.com"
-}
-
-<> 2023-07-24T103144.200.json
-
-###
-
-POST http://localhost:3000/auth/login
-Accept: application/json
-Content-Type: application/json
-Accept: application/json
-Content-Length: 68
-Connection: Keep-Alive
-User-Agent: Apache-HttpClient/4.5.14 (Java/17.0.7)
-Accept-Encoding: br,deflate,gzip,x-gzip
-
-{
-  "password": "12345Test",
-  "email": "den.parted184@aleeas.com"
-}
-
-<> 2023-07-24T101054.200.json
 
 ###
 

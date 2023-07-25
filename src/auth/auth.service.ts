@@ -7,7 +7,6 @@ import {
 } from '@nestjs/common';
 import { SignUp } from './dto/sign-up';
 import { Auth } from './dto/auth';
-import * as bcrypt from 'bcrypt';
 import * as argon2 from 'argon2';
 import { UserService } from '../user/user.service';
 import { Tokens } from './dto/tokens';
@@ -19,6 +18,7 @@ import { I18nContext, I18nService } from 'nestjs-i18n';
 import { TokenType } from './strategies/token.type';
 import { JwtPayload } from './strategies/jwt.payload';
 import { UserStatus } from '../user/enums/user.status';
+import { Role } from '../user/enums/role';
 
 @Global()
 @Injectable()
@@ -84,6 +84,7 @@ export class AuthService {
       name: auth.name,
       email: auth.email,
       status: UserStatus.PENDING,
+      role: Role.USER,
       hash: hash,
       hashRt: uid(21),
     });

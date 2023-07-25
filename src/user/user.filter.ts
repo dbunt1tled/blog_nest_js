@@ -19,6 +19,24 @@ export class UserFilter {
       emailFilter = { contains: this.filter.emailSearch };
     }
 
+    let roleFilter = undefined;
+    if (this.filter.role !== undefined) {
+      if (isArray(this.filter.role)) {
+        roleFilter = { in: this.filter.role };
+      } else {
+        roleFilter = this.filter.role;
+      }
+    }
+
+    let statusFilter = undefined;
+    if (this.filter.status !== undefined) {
+      if (isArray(this.filter.status)) {
+        statusFilter = { in: this.filter.status };
+      } else {
+        statusFilter = this.filter.status;
+      }
+    }
+
     let idFilter = undefined;
     if (this.filter.id !== undefined) {
       if (isArray(this.filter.id)) {
@@ -33,6 +51,8 @@ export class UserFilter {
         id: idFilter,
         email: emailFilter,
         name: nameFilter,
+        role: roleFilter,
+        status: statusFilter,
       },
     };
   }
