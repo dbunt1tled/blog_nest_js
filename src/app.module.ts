@@ -5,10 +5,15 @@ import { ExceptionHandler } from './handler';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { ORMModule } from './connectors/orm/o-r-m.module';
-import { AccessGuard } from './auth/decorators';
+import { AccessGuard, RolesGuard } from './auth/decorators';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MailModule } from './connectors/mail/mail.module';
-import { AcceptLanguageResolver, HeaderResolver, I18nModule, QueryResolver } from 'nestjs-i18n';
+import {
+  AcceptLanguageResolver,
+  HeaderResolver,
+  I18nModule,
+  QueryResolver,
+} from 'nestjs-i18n';
 import * as path from 'path';
 
 @Module({
@@ -43,6 +48,10 @@ import * as path from 'path';
     {
       provide: APP_GUARD,
       useClass: AccessGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
     },
   ],
 })

@@ -19,6 +19,7 @@ import { TokenType } from './strategies/token.type';
 import { JwtPayload } from './strategies/jwt.payload';
 import { UserStatus } from '../user/enums/user.status';
 import { Role } from '../user/enums/role';
+import { UserI } from '../user/interfaces/user.interface';
 
 @Global()
 @Injectable()
@@ -33,18 +34,15 @@ export class AuthService {
     return argon2.hash(password);
   }
 
-  async tokens(
-    userId: number,
-    email: string,
-    session: string,
-  ): Promise<Tokens> {
+  async tokens(user: UserI): Promise<Tokens> {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
         {
-          sub: userId,
-          email: email,
+          sub: user.id,
+          email: user.email,
           type: TokenType.ACCESS,
-          session: session,
+          role: [user.role],
+          session: user.hashRt,
         },
         {
           expiresIn: 60 * 30,
@@ -53,10 +51,11 @@ export class AuthService {
       ),
       this.jwtService.signAsync(
         {
-          sub: userId,
-          email: email,
-          type: TokenType.REFRESH,
-          session: session,
+          sub: user.id,
+          email: user.email,
+          type: TokenType.ACCESS,
+          role: [user.role],
+          session: user.hashRt,
         },
         {
           expiresIn: 60 * 60 * 24 * 30,
@@ -91,7 +90,7 @@ export class AuthService {
   }
 
   async login(auth: Auth): Promise<Tokens> {
-    const user = await this.userService.one(
+    let user = await this.userService.one(
       new UserFilter({ email: auth.email }),
     );
     if (!user) {
@@ -109,14 +108,12 @@ export class AuthService {
         }),
       );
     }
-    const session = uid(21);
-    const tokens = await this.tokens(user.id, user.email, session);
-    await this.userService.update({
-      userId: user.id,
-      hashRt: session,
-    });
 
-    return tokens;
+    user = await this.userService.update({
+      userId: user.id,
+      hashRt: uid(21),
+    });
+    return this.tokens(user);
   }
 
   async logout(userId: number) {
@@ -127,14 +124,12 @@ export class AuthService {
   }
 
   async refresh(userId: number): Promise<Tokens> {
-    const user = await this.userService.getById(userId);
-    const session = uid(21);
-    const tokens = await this.tokens(user.id, user.email, session);
-    await this.userService.update({
+    let user = await this.userService.getById(userId);
+    user = await this.userService.update({
       userId: userId,
-      hashRt: session,
+      hashRt: uid(21),
     });
-    return tokens;
+    return this.tokens(user);
   }
 
   async confirmToken(userId: number) {

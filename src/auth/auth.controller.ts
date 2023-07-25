@@ -14,13 +14,21 @@ import { Auth } from './dto/auth';
 import { SignUp } from './dto/sign-up';
 import { Response } from 'express';
 import { Tokens } from './dto/tokens';
-import { AccessGuard, CurrentUserId, Public, RefreshGuard } from './decorators';
+import {
+  AccessGuard,
+  CurrentUserId,
+  Public,
+  RefreshGuard,
+  Roles,
+  RolesGuard,
+} from './decorators';
 import { UserService } from '../user/user.service';
 import { UserStatus } from '../user/enums/user.status';
 import { I18nContext, I18nService } from 'nestjs-i18n';
 import { MailService } from '../connectors/mail/mail.service';
 import { EmailConfirmResend } from './dto/emailConfirmResend';
 import { UserFilter } from '../user/user.filter';
+import { Role } from '../user/enums/role';
 
 @Controller('auth')
 export class AuthController {
@@ -87,7 +95,10 @@ export class AuthController {
 
   @Post('confirm-email-resend')
   @Public()
-  async confirmEmailResend(@Body() email: EmailConfirmResend, @Res() res: Response) {
+  async confirmEmailResend(
+    @Body() email: EmailConfirmResend,
+    @Res() res: Response,
+  ) {
     const user = await this.userService.one(
       new UserFilter({ email: email.email }),
     );
