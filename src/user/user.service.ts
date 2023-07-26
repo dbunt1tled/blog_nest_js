@@ -29,7 +29,7 @@ export class UserService {
   update(user: UserUpdate): Promise<User> {
     return <Promise<User>>this.ormService.user.update({
       where: {
-        id: user.userId,
+        id: user.id,
       },
       data: {
         name: user.name,

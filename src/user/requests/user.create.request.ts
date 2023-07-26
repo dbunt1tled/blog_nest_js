@@ -6,7 +6,7 @@ import { isDBUnique, Match } from '../decorators';
 export class UserCreateRequest {
   @IsNotEmpty({ message: 'validation.NOT_EMPTY' })
   @IsEmail({}, { message: 'validation.INVALID_EMAIL' })
-  @isDBUnique('user', 'email', 'id')
+  @isDBUnique('user', 'email')
   email: string;
   @IsNotEmpty({ message: 'validation.NOT_EMPTY' })
   @IsString()

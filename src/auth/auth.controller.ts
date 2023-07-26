@@ -85,7 +85,7 @@ export class AuthController {
       );
     }
     await this.userService.update({
-      userId: user.id,
+      id: user.id,
       status: UserStatus.ACTIVE,
       confirmedAt: new Date(),
       hashRt: null,

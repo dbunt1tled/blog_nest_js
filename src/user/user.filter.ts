@@ -1,5 +1,5 @@
 import { isArray } from 'class-validator';
-import { UFilter } from './dto/user.filter.interface';
+import { UFilter } from './dto/user.filter';
 
 export class UserFilter {
   constructor(private readonly filter: UFilter) {}

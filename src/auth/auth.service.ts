@@ -106,7 +106,7 @@ export class AuthService {
     }
 
     user = await this.userService.update({
-      userId: user.id,
+      id: user.id,
       hashRt: uid(21),
     });
     return this.tokens(user);
@@ -114,7 +114,7 @@ export class AuthService {
 
   async logout(userId: number) {
     await this.userService.update({
-      userId: userId,
+      id: userId,
       hashRt: uid(21),
     });
   }
@@ -122,7 +122,7 @@ export class AuthService {
   async refresh(userId: number): Promise<Tokens> {
     let user = await this.userService.getById(userId);
     user = await this.userService.update({
-      userId: userId,
+      id: userId,
       hashRt: uid(21),
     });
     return this.tokens(user);

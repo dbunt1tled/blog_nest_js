@@ -1,12 +1,14 @@
 import {
   Body,
   Controller,
-  Get,
+  Delete, Get,
   HttpStatus,
+  NotFoundException,
   Param,
   Post,
-  Res,
-  UnprocessableEntityException,
+  Put,
+  Query,
+  Res
 } from '@nestjs/common';
 import { Response } from 'express';
 import { UserService } from './user.service';
@@ -15,6 +17,12 @@ import { MailService } from '../connectors/mail/mail.service';
 import { UserCreateRequest } from './requests/user.create.request';
 import { UserCreate } from './dto/user.create';
 import * as argon2 from 'argon2';
+import { UserUpdateRequest } from './requests/user.update.request';
+import { UserUpdate } from './dto/user.update';
+import { UserStatus } from './enums/user.status';
+import { UFilter } from './dto/user.filter';
+import { UserListRequest } from './requests/user.list.request';
+import { UserFilter } from './user.filter';
 
 @Controller('users')
 export class UserController {
@@ -23,12 +31,56 @@ export class UserController {
     private readonly userService: UserService,
     private readonly mailService: MailService,
   ) {}
+
+  @Get('')
+  async list(@Query() req: UserListRequest, @Res() res: Response) {
+    const users = await this.userService.list(new UserFilter(<UFilter>req));
+    res.status(HttpStatus.OK).json(users).send();
+  }
+
   @Post('')
   async create(@Body() req: UserCreateRequest, @Res() res: Response) {
     const user = await this.userService.create(<UserCreate>{
       ...req,
       ...{ hash: await argon2.hash(req.password) },
     });
+    res.status(HttpStatus.CREATED).json(user).send();
+  }
+
+  @Put(':id')
+  async update(
+    @Param('id') id,
+    @Body() req: UserUpdateRequest,
+    @Res() res: Response,
+  ) {
+    let user = await this.userService.findById(id);
+    if (!user || user.id !== req.id) {
+      throw new NotFoundException(
+        this.i18n.t('app.alert.user_not_found', {
+          lang: I18nContext.current().lang,
+        }),
+      );
+    }
+    user = await this.userService.update(<UserUpdate>{
+      ...req,
+      ...{ hash: req.password ? await argon2.hash(req.password) : undefined },
+    });
+    res.status(HttpStatus.OK).json(user).send();
+  }
+
+  @Delete(':id')
+  async delete(@Param('id') id, @Res() res: Response) {
+    const user = await this.userService.getById(id);
+    await this.userService.update({
+      id: user.id,
+      status: UserStatus.DELETED,
+    });
+    res.status(HttpStatus.NO_CONTENT).json().send();
+  }
+
+  @Get(':id')
+  async view(@Param('id') id, @Res() res: Response) {
+    const user = await this.userService.getById(id);
     res.status(HttpStatus.OK).json(user).send();
   }
 }
