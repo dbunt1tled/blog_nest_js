@@ -7,7 +7,7 @@ import {
 import { UserService } from '../../user.service';
 import { UserFilter } from '../../user.filter';
 import { Injectable } from '@nestjs/common';
-import { UserFilterI } from '../../interfaces/user.filter.interface';
+import { UFilter } from '../../dto/user.filter.interface';
 import { ORMService } from '../../../connectors/orm/o-r-m.service';
 import { PrismaClient } from '@prisma/client';
 

@@ -1,7 +1,7 @@
 import { UserStatus } from '../enums/user.status';
 import { Role } from '../enums/role';
 
-export interface UserFilterI {
+export interface UFilter {
   id?: number | number[];
   email?: string;
   name?: string;

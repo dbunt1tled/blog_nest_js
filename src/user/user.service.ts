@@ -1,9 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ORMService } from '../connectors/orm/o-r-m.service';
 import { UserFilter } from './user.filter';
-import { UserUpdate } from './dto/UserUpdate';
-import { UserCreate } from './dto/UserCreate';
-import { UserI } from './interfaces/user.interface';
+import { UserUpdate } from './dto/user.update';
+import { UserCreate } from './dto/user.create';
+import { User } from './models/user';
 import { I18nContext, I18nService } from 'nestjs-i18n';
 
 @Injectable()
@@ -12,8 +12,8 @@ export class UserService {
     private readonly i18n: I18nService,
     private readonly ormService: ORMService,
   ) {}
-  create(user: UserCreate): Promise<UserI> {
-    return <Promise<UserI>>this.ormService.user.create({
+  create(user: UserCreate): Promise<User> {
+    return <Promise<User>>this.ormService.user.create({
       data: {
         name: user.name,
         email: user.email,
@@ -26,8 +26,8 @@ export class UserService {
     });
   }
 
-  update(user: UserUpdate): Promise<UserI> {
-    return <Promise<UserI>>this.ormService.user.update({
+  update(user: UserUpdate): Promise<User> {
+    return <Promise<User>>this.ormService.user.update({
       where: {
         id: user.userId,
       },
@@ -43,13 +43,13 @@ export class UserService {
     });
   }
 
-  findById(id: number): Promise<UserI | null> {
-    return <Promise<UserI | null>>this.ormService.user.findFirst({
+  findById(id: number): Promise<User | null> {
+    return <Promise<User | null>>this.ormService.user.findFirst({
       where: { id: id },
     });
   }
-  getById(id: number): Promise<UserI> {
-    return <Promise<UserI>>this.ormService.user
+  getById(id: number): Promise<User> {
+    return <Promise<User>>this.ormService.user
       .findUniqueOrThrow({
         where: { id: id },
       })
@@ -63,12 +63,12 @@ export class UserService {
   }
 
   one(filter: UserFilter) {
-    return <Promise<UserI | null>>(
+    return <Promise<User | null>>(
       this.ormService.user.findFirst(filter.build())
     );
   }
 
   list(filter: UserFilter) {
-    return <Promise<UserI[] | []>>this.ormService.user.findMany(filter.build());
+    return <Promise<User[] | []>>this.ormService.user.findMany(filter.build());
   }
 }

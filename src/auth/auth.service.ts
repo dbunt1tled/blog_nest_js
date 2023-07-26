@@ -19,7 +19,7 @@ import { TokenType } from './strategies/token.type';
 import { JwtPayload } from './strategies/jwt.payload';
 import { UserStatus } from '../user/enums/user.status';
 import { Role } from '../user/enums/role';
-import { UserI } from '../user/interfaces/user.interface';
+import { User } from '../user/models/user';
 
 @Global()
 @Injectable()
@@ -30,7 +30,7 @@ export class AuthService {
     private readonly i18n: I18nService,
   ) {}
 
-  async tokens(user: UserI): Promise<Tokens> {
+  async tokens(user: User): Promise<Tokens> {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
         {

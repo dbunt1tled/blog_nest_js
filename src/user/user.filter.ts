@@ -1,8 +1,8 @@
 import { isArray } from 'class-validator';
-import { UserFilterI } from './interfaces/user.filter.interface';
+import { UFilter } from './dto/user.filter.interface';
 
 export class UserFilter {
-  constructor(private readonly filter: UserFilterI) {}
+  constructor(private readonly filter: UFilter) {}
 
   build() {
     let nameFilter = undefined;

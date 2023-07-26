@@ -1,7 +1,7 @@
 import { UserStatus } from '../enums/user.status';
 import { Role } from '../enums/role';
 
-export interface UserI {
+export interface User {
   id?: number;
   status: UserStatus;
   email: string;
