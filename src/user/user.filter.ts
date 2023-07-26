@@ -4,7 +4,7 @@ import { UFilter } from './dto/user.filter.interface';
 export class UserFilter {
   constructor(private readonly filter: UFilter) {}
 
-  build() {
+  build(limit: number|undefined = undefined) {
     let nameFilter = undefined;
     if (this.filter.name !== undefined) {
       nameFilter = this.filter.name;
@@ -54,6 +54,7 @@ export class UserFilter {
         role: roleFilter,
         status: statusFilter,
       },
+      take: limit,
     };
   }
 }

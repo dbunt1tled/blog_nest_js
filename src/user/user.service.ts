@@ -46,6 +46,7 @@ export class UserService {
   findById(id: number): Promise<User | null> {
     return <Promise<User | null>>this.ormService.user.findFirst({
       where: { id: id },
+      take: 1,
     });
   }
   getById(id: number): Promise<User> {
@@ -64,7 +65,7 @@ export class UserService {
 
   one(filter: UserFilter) {
     return <Promise<User | null>>(
-      this.ormService.user.findFirst(filter.build())
+      this.ormService.user.findFirst(filter.build(1))
     );
   }
 
