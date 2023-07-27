@@ -16,6 +16,7 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
+    "esModuleInterop": true,
     "noFallthroughCasesInSwitch": false
   },
   "filesGlob": [

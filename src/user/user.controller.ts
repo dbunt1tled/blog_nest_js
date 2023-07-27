@@ -1,14 +1,15 @@
 import {
   Body,
   Controller,
-  Delete, Get,
+  Delete,
+  Get,
   HttpStatus,
   NotFoundException,
   Param,
   Post,
   Put,
   Query,
-  Res
+  Res,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { UserService } from './user.service';
@@ -23,6 +24,8 @@ import { UserStatus } from './enums/user.status';
 import { UFilter } from './dto/user.filter';
 import { UserListRequest } from './requests/user.list.request';
 import { UserFilter } from './user.filter';
+import userSerializer from './serializers/user.serializer';
+import { UserResponseService } from './user.response.service';
 
 @Controller('users')
 export class UserController {
@@ -30,12 +33,16 @@ export class UserController {
     private readonly i18n: I18nService,
     private readonly userService: UserService,
     private readonly mailService: MailService,
+    private readonly userResponseService: UserResponseService,
   ) {}
 
   @Get('')
-  async list(@Query() req: UserListRequest, @Res() res: Response) {
-    const users = await this.userService.list(new UserFilter(<UFilter>req));
-    res.status(HttpStatus.OK).json(users).send();
+  async list(@Query() query: UserListRequest, @Res() res: Response) {
+    const users = await this.userService.list(new UserFilter(<UFilter>query));
+    res
+      .status(HttpStatus.OK)
+      .json(this.userResponseService.response(users, query))
+      .send();
   }
 
   @Post('')
@@ -44,12 +51,15 @@ export class UserController {
       ...req,
       ...{ hash: await argon2.hash(req.password) },
     });
-    res.status(HttpStatus.CREATED).json(user).send();
+    res
+      .status(HttpStatus.CREATED)
+      .json(userSerializer.serialize('user', user))
+      .send();
   }
 
   @Put(':id')
   async update(
-    @Param('id') id,
+    @Param('id') id: number,
     @Body() req: UserUpdateRequest,
     @Res() res: Response,
   ) {
@@ -65,11 +75,14 @@ export class UserController {
       ...req,
       ...{ hash: req.password ? await argon2.hash(req.password) : undefined },
     });
-    res.status(HttpStatus.OK).json(user).send();
+    res
+      .status(HttpStatus.OK)
+      .json(userSerializer.serialize('user', user))
+      .send();
   }
 
   @Delete(':id')
-  async delete(@Param('id') id, @Res() res: Response) {
+  async delete(@Param('id') id: number, @Res() res: Response) {
     const user = await this.userService.getById(id);
     await this.userService.update({
       id: user.id,
@@ -79,8 +92,11 @@ export class UserController {
   }
 
   @Get(':id')
-  async view(@Param('id') id, @Res() res: Response) {
+  async view(@Param('id') id: number, @Res() res: Response) {
     const user = await this.userService.getById(id);
-    res.status(HttpStatus.OK).json(user).send();
+    res
+      .status(HttpStatus.OK)
+      .json(userSerializer.serialize('user', user))
+      .send();
   }
 }
