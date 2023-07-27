@@ -4,14 +4,14 @@ import {
   IsEnum,
   IsNotEmpty,
   IsOptional,
-  IsString,
+  IsString, ValidateNested
 } from 'class-validator';
 import { UserStatus } from '../enums/user.status';
 import { Role } from '../enums/role';
 import { isDBUnique, Match } from '../decorators';
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 
-export class UserListQuery {
+class Filter {
   @IsOptional()
   @IsEmail({}, { message: 'validation.INVALID_EMAIL' })
   @isDBUnique('user', 'email')
@@ -27,6 +27,12 @@ export class UserListQuery {
   @IsArray()
   @IsEnum(Role, { each: true })
   role?: Role[];
+}
+
+export class UserListQuery {
+  @ValidateNested()
+  @Type(() => Filter)
+  filter: Filter;
   @IsOptional()
   @IsString()
   include?: string|null;

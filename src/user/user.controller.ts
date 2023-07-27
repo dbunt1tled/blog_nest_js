@@ -22,9 +22,8 @@ import { UserUpdateRequest } from './requests/user.update.request';
 import { UserUpdate } from './dto/user.update';
 import { UserStatus } from './enums/user.status';
 import { UFilter } from './dto/user.filter';
-import { UserListQuery } from './requests/userListQuery';
+import { UserListQuery } from './requests/user.list.query';
 import { UserFilter } from './user.filter';
-import userSerializer from './serializers/user.serializer';
 import { UserResponseService } from './user.response.service';
 import { IncludeQuery } from '../connectors/requests';
 
@@ -43,7 +42,9 @@ export class UserController {
     @Res() res: Response,
   ): Promise<void> {
     console.log(query);
-    const users = await this.userService.list(new UserFilter(<UFilter>query));
+    const users = await this.userService.list(
+      new UserFilter(<UFilter>query.filter),
+    );
     res
       .status(HttpStatus.OK)
       .json(await this.userResponseService.response(users, query))
@@ -62,7 +63,7 @@ export class UserController {
     });
     res
       .status(HttpStatus.CREATED)
-      .json(await this.userResponseService.response(users, query))
+      .json(await this.userResponseService.response(user, query))
       .send();
   }
 
@@ -87,7 +88,7 @@ export class UserController {
     });
     res
       .status(HttpStatus.OK)
-      .json(await this.userResponseService.response(users, query))
+      .json(await this.userResponseService.response(user, query))
       .send();
   }
 
@@ -114,7 +115,7 @@ export class UserController {
     const user = await this.userService.getById(id);
     res
       .status(HttpStatus.OK)
-      .json(await this.userResponseService.response(users, query))
+      .json(await this.userResponseService.response(user, query))
       .send();
   }
 }

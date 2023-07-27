@@ -1,1 +1,1 @@
-export * from './postSerializer';
+export * from './post.serializer';
