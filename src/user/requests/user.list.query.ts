@@ -11,7 +11,7 @@ import { Role } from '../enums/role';
 import { isDBUnique, Match } from '../decorators';
 import { Transform } from 'class-transformer';
 
-export class UserListRequest {
+export class UserListQuery {
   @IsOptional()
   @IsEmail({}, { message: 'validation.INVALID_EMAIL' })
   @isDBUnique('user', 'email')
@@ -27,4 +27,7 @@ export class UserListRequest {
   @IsArray()
   @IsEnum(Role, { each: true })
   role?: Role[];
+  @IsOptional()
+  @IsString()
+  include?: string|null;
 }

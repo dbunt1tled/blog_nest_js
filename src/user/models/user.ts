@@ -1,5 +1,6 @@
 import { UserStatus } from '../enums/user.status';
 import { Role } from '../enums/role';
+import { Post } from '../../post/models/post';
 
 export interface User {
   id?: number;
@@ -12,4 +13,5 @@ export interface User {
   confirmedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
+  post?: Post[];
 }

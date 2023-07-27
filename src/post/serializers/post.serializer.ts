@@ -1,8 +1,7 @@
-import { User } from '../models/user';
+import { Post } from '../models/post';
 
-const userSerializer = {
+const postSerializer = {
   id: 'id',
-  blacklist: ['hashRt', 'hash'],
   topLevelMeta: function (data, extraData) {
     return {
       total: data.total,
@@ -12,12 +11,12 @@ const userSerializer = {
     };
   },
   links: {
-    self: function (data: User) {
-      return '/users/' + data.id;
+    self: function (data: Post) {
+      return '/posts/' + data.id;
     },
   },
   relationships: {},
   jsonapiObject: false,
 };
 
-export default userSerializer;
+export default postSerializer;

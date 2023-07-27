@@ -22,10 +22,11 @@ import { UserUpdateRequest } from './requests/user.update.request';
 import { UserUpdate } from './dto/user.update';
 import { UserStatus } from './enums/user.status';
 import { UFilter } from './dto/user.filter';
-import { UserListRequest } from './requests/user.list.request';
+import { UserListQuery } from './requests/userListQuery';
 import { UserFilter } from './user.filter';
 import userSerializer from './serializers/user.serializer';
 import { UserResponseService } from './user.response.service';
+import { IncludeQuery } from '../connectors/requests';
 
 @Controller('users')
 export class UserController {
@@ -37,32 +38,41 @@ export class UserController {
   ) {}
 
   @Get('')
-  async list(@Query() query: UserListRequest, @Res() res: Response) {
+  async list(
+    @Query() query: UserListQuery,
+    @Res() res: Response,
+  ): Promise<void> {
+    console.log(query);
     const users = await this.userService.list(new UserFilter(<UFilter>query));
     res
       .status(HttpStatus.OK)
-      .json(this.userResponseService.response(users, query))
+      .json(await this.userResponseService.response(users, query))
       .send();
   }
 
   @Post('')
-  async create(@Body() req: UserCreateRequest, @Res() res: Response) {
+  async create(
+    @Query() query: IncludeQuery,
+    @Body() req: UserCreateRequest,
+    @Res() res: Response,
+  ): Promise<void> {
     const user = await this.userService.create(<UserCreate>{
       ...req,
       ...{ hash: await argon2.hash(req.password) },
     });
     res
       .status(HttpStatus.CREATED)
-      .json(userSerializer.serialize('user', user))
+      .json(await this.userResponseService.response(users, query))
       .send();
   }
 
   @Put(':id')
   async update(
     @Param('id') id: number,
+    @Query() query: IncludeQuery,
     @Body() req: UserUpdateRequest,
     @Res() res: Response,
-  ) {
+  ): Promise<void> {
     let user = await this.userService.findById(id);
     if (!user || user.id !== req.id) {
       throw new NotFoundException(
@@ -77,12 +87,16 @@ export class UserController {
     });
     res
       .status(HttpStatus.OK)
-      .json(userSerializer.serialize('user', user))
+      .json(await this.userResponseService.response(users, query))
       .send();
   }
 
   @Delete(':id')
-  async delete(@Param('id') id: number, @Res() res: Response) {
+  async delete(
+    @Param('id') id: number,
+    @Query() query: IncludeQuery,
+    @Res() res: Response,
+  ): Promise<void> {
     const user = await this.userService.getById(id);
     await this.userService.update({
       id: user.id,
@@ -92,11 +106,15 @@ export class UserController {
   }
 
   @Get(':id')
-  async view(@Param('id') id: number, @Res() res: Response) {
+  async view(
+    @Param('id') id: number,
+    @Query() query: IncludeQuery,
+    @Res() res: Response,
+  ): Promise<void> {
     const user = await this.userService.getById(id);
     res
       .status(HttpStatus.OK)
-      .json(userSerializer.serialize('user', user))
+      .json(await this.userResponseService.response(users, query))
       .send();
   }
 }

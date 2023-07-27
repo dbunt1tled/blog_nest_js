@@ -3,40 +3,55 @@ import { User } from './models/user';
 import { I18nContext, I18nService } from 'nestjs-i18n';
 import { UserService } from './user.service';
 import JSONAPISerializer from 'json-api-serializer';
+import { PostService } from '../post/post.service';
+import { isArray } from 'class-validator';
+import { PostFilter } from '../post/post.filter';
+import userSerializer from './serializers/user.serializer';
+import postSerializer from '../post/serializers/post.serializer';
+import { IncludeQuery } from '../connectors/requests';
 
 @Injectable()
 export class UserResponseService {
-  constructor(
-    private readonly i18n: I18nService,
-    private readonly userService: UserService,
-  ) {}
+  constructor(private readonly postService: PostService) {}
 
-  response(user: User | User[], request?: object): object {
-    const userSerializer: JSONAPISerializer = new JSONAPISerializer({
+  async response(
+    user: User | User[],
+    query?: IncludeQuery,
+  ): Promise<object> {
+    const serializer: JSONAPISerializer = new JSONAPISerializer({
       convertCase: 'camelCase',
       unconvertCase: 'snake_case',
       convertCaseCacheSize: 100,
     });
-    userSerializer.register('user', {
-      id: 'id',
-      blacklist: ['hashRt', 'hash'],
-      topLevelMeta: function (data, extraData) {
-        return {
-          total: data.total,
-          currentPage: extraData.currentPage,
-          perPage: extraData.perPage,
-          totalPages: extraData.totalPages,
+    console.log(query);
+    const relationships = {};
+    const terms = query?.include?.split(',') ?? [];
+    for (let term of terms) {
+      term = term.trim();
+      if (term === 'post') {
+        relationships[term] = {
+          type: term,
         };
-      },
-      links: {
-        self: function (data: User) {
-          return '/users/' + data.id;
-        },
-      },
-      jsonapiObject: false,
-    });
-    return userSerializer.serialize('user', user, {
-      count: 1,
-    });
+        if (isArray(user)) {
+          for (const element of user) {
+            element.post = await this.postService.list(
+              new PostFilter({
+                authorId: element.id,
+              }),
+            );
+          }
+        } else {
+          user.post = await this.postService.list(
+            new PostFilter({
+              authorId: user.id,
+            }),
+          );
+        }
+        serializer.register('post', postSerializer);
+      }
+    }
+    userSerializer.relationships = relationships;
+    serializer.register('user', userSerializer);
+    return await serializer.serializeAsync('user', user);
   }
 }
