@@ -1,19 +1,24 @@
 import { User } from '../models/user';
+import { Paginator } from '../../connectors/requests/pagination/paginator';
 
 const userSerializer = {
   id: 'id',
   blacklist: ['hashRt', 'hash'],
-  topLevelMeta: function (data, extraData) {
-    return {
-      total: data.total,
-      currentPage: extraData.currentPage,
-      perPage: extraData.perPage,
-      totalPages: extraData.totalPages,
-    };
+  topLevelMeta: function (data) {
+    if ('data' in data) {
+      const paginator = <Paginator>data.data;
+      return {
+        total: paginator.total,
+        currentPage: paginator.page,
+        perPage: paginator.perPage,
+        totalPages: paginator.totalPage,
+      };
+    }
+    return {};
   },
   links: {
     self: function (data: User) {
-      return '/users/' + data.id;
+      return `/users` + (data.id !== undefined ? `/${data.id}` : '');
     },
   },
   relationships: {},

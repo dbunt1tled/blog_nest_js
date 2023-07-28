@@ -1,10 +1,18 @@
 import { isArray } from 'class-validator';
 import { UFilter } from './dto/user.filter';
+import { PaginationQuery } from '../connectors/requests';
+import { Pagination } from '../connectors/requests/pagination/pagination';
 
 export class UserFilter {
-  constructor(private readonly filter: UFilter) {}
+  constructor(
+    public readonly filter: UFilter,
+    public readonly pagination?: Pagination,
+  ) {}
 
-  build(limit: number|undefined = undefined) {
+  build(limit: number | undefined = undefined) {
+    let take: number = limit;
+    let skip = undefined;
+    let orderBy = undefined;
     let nameFilter = undefined;
     if (this.filter.name !== undefined) {
       nameFilter = this.filter.name;
@@ -46,6 +54,16 @@ export class UserFilter {
       }
     }
 
+    if (this.pagination) {
+      take = this.pagination.limit;
+      skip = (this.pagination.page - 1) * this.pagination.limit;
+      if (
+        this.pagination.field &&
+        Object.keys(this.pagination.field).length > 0
+      ) {
+        orderBy = this.pagination.field;
+      }
+    }
     return {
       where: {
         id: idFilter,
@@ -54,7 +72,9 @@ export class UserFilter {
         role: roleFilter,
         status: statusFilter,
       },
-      take: limit,
+      skip: skip,
+      take: take,
+      orderBy: orderBy,
     };
   }
 }

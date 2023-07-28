@@ -5,6 +5,8 @@ import { UserUpdate } from './dto/user.update';
 import { UserCreate } from './dto/user.create';
 import { User } from './models/user';
 import { I18nContext, I18nService } from 'nestjs-i18n';
+import { PaginationQuery } from '../connectors/requests';
+import { Paginator } from '../connectors/requests/pagination/paginator';
 
 @Injectable()
 export class UserService {
@@ -12,6 +14,7 @@ export class UserService {
     private readonly i18n: I18nService,
     private readonly ormService: ORMService,
   ) {}
+
   create(user: UserCreate): Promise<User> {
     return <Promise<User>>this.ormService.user.create({
       data: {
@@ -49,6 +52,7 @@ export class UserService {
       take: 1,
     });
   }
+
   getById(id: number): Promise<User> {
     return <Promise<User>>this.ormService.user
       .findUniqueOrThrow({
@@ -69,7 +73,24 @@ export class UserService {
     );
   }
 
-  list(filter: UserFilter) {
-    return <Promise<User[] | []>>this.ormService.user.findMany(filter.build());
+  async list(filter: UserFilter): Promise<User[] | Paginator> {
+    const filterData = filter.build();
+    const users = await (<Promise<User[]>>(
+      this.ormService.user.findMany(filterData)
+    ));
+    if (!filter.pagination.page) {
+      return users;
+    }
+    filterData.orderBy = undefined;
+    filterData.take = undefined;
+    filterData.skip = undefined;
+    const count = await this.ormService.user.count(filterData);
+    return <Paginator>{
+      data: users,
+      total: users.length,
+      page: filter.pagination.page,
+      perPage: filter.pagination.limit,
+      totalPage: count === 0 ? 1 : Math.ceil(count / filter.pagination.limit),
+    };
   }
 }

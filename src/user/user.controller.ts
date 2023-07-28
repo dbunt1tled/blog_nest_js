@@ -25,7 +25,10 @@ import { UFilter } from './dto/user.filter';
 import { UserListQuery } from './requests/user.list.query';
 import { UserFilter } from './user.filter';
 import { UserResponseService } from './user.response.service';
-import { IncludeQuery } from '../connectors/requests';
+import { IncludeQuery, PaginationQuery } from '../connectors/requests';
+import { PaginationQueryTransform } from '../connectors/requests/pagination/pagination.query.transform';
+import { Pagination } from '../connectors/requests/pagination/pagination';
+import { User } from './models/user';
 
 @Controller('users')
 export class UserController {
@@ -39,15 +42,15 @@ export class UserController {
   @Get('')
   async list(
     @Query() query: UserListQuery,
+    @Query('', PaginationQueryTransform) pagination: Pagination,
     @Res() res: Response,
   ): Promise<void> {
-    console.log(query);
     const users = await this.userService.list(
-      new UserFilter(<UFilter>query.filter),
+      new UserFilter(<UFilter>query.filter, pagination),
     );
     res
       .status(HttpStatus.OK)
-      .json(await this.userResponseService.response(users, query))
+      .json(await this.userResponseService.response(<User[]>users, query))
       .send();
   }
 

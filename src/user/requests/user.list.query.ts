@@ -3,13 +3,17 @@ import {
   IsEmail,
   IsEnum,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
-  IsString, ValidateNested
+  IsString,
+  ValidateNested,
 } from 'class-validator';
 import { UserStatus } from '../enums/user.status';
 import { Role } from '../enums/role';
 import { isDBUnique, Match } from '../decorators';
 import { Transform, Type } from 'class-transformer';
+import { PaginationQuery } from '../../connectors/requests';
+import { PaginationRequest } from '../../connectors/requests/pagination/pagination.request';
 
 class Filter {
   @IsOptional()
@@ -29,11 +33,20 @@ class Filter {
   role?: Role[];
 }
 
-export class UserListQuery {
+export class UserListQuery implements PaginationRequest {
   @ValidateNested()
   @Type(() => Filter)
   filter: Filter;
   @IsOptional()
   @IsString()
-  include?: string|null;
+  include?: string | null;
+
+  @Transform((i) => parseInt(i.value))
+  @IsNumber()
+  limit = 10;
+  @Transform((i) => parseInt(i.value))
+  @IsNumber()
+  page = 1;
+  @IsOptional()
+  sortBy?: PaginationQuery;
 }

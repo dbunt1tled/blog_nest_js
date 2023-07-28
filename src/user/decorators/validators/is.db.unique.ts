@@ -1,8 +1,9 @@
 import {
-  registerDecorator, ValidationArguments,
+  registerDecorator,
+  ValidationArguments,
   ValidationOptions,
   ValidatorConstraint,
-  ValidatorConstraintInterface
+  ValidatorConstraintInterface,
 } from 'class-validator';
 import { UserService } from '../../user.service';
 import { UserFilter } from '../../user.filter';
@@ -29,16 +30,18 @@ export class IsUniqueDatabase implements ValidatorConstraintInterface {
     const table = await getModel(model);
     const filter = { [field]: value };
     if (param !== undefined) {
-      filter['NOT'] = {[param]: args.object[param]};
+      filter['NOT'] = { [param]: args.object[param] };
     }
     return table
       .findFirst({
         where: <any>filter,
         take: 1,
-    }).then((user) => {
+      })
+      .then((user) => {
         return !user;
       });
   }
+
   defaultMessage(args: ValidationArguments) {
     const field = args.property;
     const value = (args.object as any)[field];
@@ -50,7 +53,7 @@ export function isDBUnique(
   model: string,
   field: string,
   param?: string,
-  validationOptions?: ValidationOptions
+  validationOptions?: ValidationOptions,
 ) {
   return function (object: object, propertyName: string) {
     registerDecorator({
