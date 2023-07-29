@@ -17,6 +17,7 @@ import {
 import * as path from 'path';
 import { PaginationQueryTransform } from './connectors/requests/pagination/pagination.query.transform';
 import { Service } from './connectors/service/service';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { Service } from './connectors/service/service';
         AcceptLanguageResolver,
       ],
     }),
+    EmailModule,
   ],
   controllers: [],
   providers: [
