@@ -16,6 +16,7 @@ import {
 } from 'nestjs-i18n';
 import * as path from 'path';
 import { PaginationQueryTransform } from './connectors/requests/pagination/pagination.query.transform';
+import { Service } from './connectors/service/service';
 
 @Module({
   imports: [
@@ -55,7 +56,8 @@ import { PaginationQueryTransform } from './connectors/requests/pagination/pagin
       useClass: RolesGuard,
     },
     PaginationQueryTransform,
+    Service,
   ],
-  exports: [PaginationQueryTransform],
+  exports: [PaginationQueryTransform, Service],
 })
 export class AppModule {}

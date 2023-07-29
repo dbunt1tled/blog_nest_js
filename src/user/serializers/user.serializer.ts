@@ -6,7 +6,7 @@ const userSerializer = {
   blacklist: ['hashRt', 'hash'],
   topLevelMeta: function (data) {
     if ('data' in data) {
-      const paginator = <Paginator>data.data;
+      const paginator = <Paginator<User>>data.data;
       return {
         total: paginator.total,
         currentPage: paginator.page,

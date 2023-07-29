@@ -1,20 +1,21 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { User } from './models/user';
-import JSONAPISerializer from 'json-api-serializer';
-import { PostService } from '../post/post.service';
+import { Injectable } from '@nestjs/common';
 import { isArray } from 'class-validator';
-import { PostFilter } from '../post/post.filter';
-import userSerializer from './serializers/user.serializer';
-import postSerializer from '../post/serializers/post.serializer';
+import JSONAPISerializer from 'json-api-serializer';
 import { IncludeQuery } from '../connectors/requests';
 import { Paginator } from '../connectors/requests/pagination/paginator';
+import { Post } from '../post/models/post';
+import { PostFilter } from '../post/post.filter';
+import { PostService } from '../post/post.service';
+import postSerializer from '../post/serializers/post.serializer';
+import { User } from './models/user';
+import userSerializer from './serializers/user.serializer';
 
 @Injectable()
 export class UserResponseService {
   constructor(private readonly postService: PostService) {}
 
   async response(
-    userData: User | User[] | Paginator,
+    userData: User | User[] | Paginator<User>,
     query?: IncludeQuery,
   ): Promise<object> {
     const serializer: JSONAPISerializer = new JSONAPISerializer({
@@ -24,16 +25,16 @@ export class UserResponseService {
     });
     const relationships = {};
     const terms = query?.include?.split(',') ?? [];
+    let data = userData;
     for (let term of terms) {
       term = term.trim();
       if (term === 'post') {
         relationships[term] = {
           type: term,
         };
-
         if (isArray(userData)) {
           for (const element of userData) {
-            element.post = await this.postService.list(
+            element.post = <Post[]>await this.postService.list(
               new PostFilter({
                 authorId: element.id,
               }),
@@ -41,14 +42,15 @@ export class UserResponseService {
           }
         } else if ('data' in userData) {
           for (const element of userData.data) {
-            element.post = await this.postService.list(
+            element.post = <Post[]>await this.postService.list(
               new PostFilter({
                 authorId: element.id,
               }),
             );
           }
-        } else if ('post' in userData) {
-          userData.post = await this.postService.list(
+          data = userData.data;
+        } else {
+          userData.post = <Post[]>await this.postService.list(
             new PostFilter({
               authorId: userData.id,
             }),
@@ -57,8 +59,10 @@ export class UserResponseService {
         serializer.register('post', postSerializer);
       }
     }
+
     userSerializer.relationships = relationships;
     serializer.register('user', userSerializer);
-    return await serializer.serializeAsync('user', userData);
+    console.log(userData);
+    return await serializer.serializeAsync('user', data);
   }
 }

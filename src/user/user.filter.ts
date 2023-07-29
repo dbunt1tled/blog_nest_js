@@ -2,14 +2,17 @@ import { isArray } from 'class-validator';
 import { UFilter } from './dto/user.filter';
 import { PaginationQuery } from '../connectors/requests';
 import { Pagination } from '../connectors/requests/pagination/pagination';
+import { Filter } from '../connectors/repository/filter';
+import { FilterCondition } from '../connectors/repository/filterCondition';
 
-export class UserFilter {
+export class UserFilter extends Filter{
   constructor(
     public readonly filter: UFilter,
     public readonly pagination?: Pagination,
-  ) {}
-
-  build(limit: number | undefined = undefined) {
+  ) {
+    super(pagination);
+  }
+  build(limit: number | undefined = undefined): FilterCondition {
     let take: number = limit;
     let skip = undefined;
     let orderBy = undefined;
@@ -64,7 +67,7 @@ export class UserFilter {
         orderBy = this.pagination.field;
       }
     }
-    return {
+    return <FilterCondition>{
       where: {
         id: idFilter,
         email: emailFilter,

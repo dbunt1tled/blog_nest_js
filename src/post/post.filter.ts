@@ -1,10 +1,18 @@
 import { isArray } from 'class-validator';
+import { Filter } from '../connectors/repository/filter';
+import { FilterCondition } from '../connectors/repository/filterCondition';
+import { Pagination } from '../connectors/requests/pagination/pagination';
 import { PFilter } from './dto/post.filter';
 
-export class PostFilter {
-  constructor(private readonly filter: PFilter) {}
+export class PostFilter extends Filter {
+  constructor(
+    public readonly filter: PFilter,
+    public readonly pagination?: Pagination,
+  ) {
+    super(pagination);
+  }
 
-  build(limit: number|undefined = undefined) {
+  build(limit: number | undefined = undefined): FilterCondition {
     let titleFilter = undefined;
     if (this.filter.titleSearch !== undefined) {
       titleFilter = { contains: this.filter.titleSearch };
@@ -29,7 +37,7 @@ export class PostFilter {
     }
 
     let authorIdFilter = undefined;
-    if (this.filter.id !== undefined) {
+    if (this.filter.authorId !== undefined) {
       if (isArray(this.filter.authorId)) {
         authorIdFilter = { in: this.filter.authorId };
       } else {

@@ -28,7 +28,6 @@ import { UserResponseService } from './user.response.service';
 import { IncludeQuery, PaginationQuery } from '../connectors/requests';
 import { PaginationQueryTransform } from '../connectors/requests/pagination/pagination.query.transform';
 import { Pagination } from '../connectors/requests/pagination/pagination';
-import { User } from './models/user';
 
 @Controller('users')
 export class UserController {
@@ -50,7 +49,7 @@ export class UserController {
     );
     res
       .status(HttpStatus.OK)
-      .json(await this.userResponseService.response(<User[]>users, query))
+      .json(await this.userResponseService.response(users, query))
       .send();
   }
 

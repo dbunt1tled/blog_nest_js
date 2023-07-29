@@ -14,4 +14,5 @@ export interface User {
   createdAt: Date;
   updatedAt: Date;
   post?: Post[];
+  interface?: 'Entity';
 }
