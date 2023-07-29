@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { MailController } from './mailController';
+import { MailController } from './mail.controller';
 import { AppService } from './app.service';
 
 @Module({
