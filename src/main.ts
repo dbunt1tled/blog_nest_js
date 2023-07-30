@@ -1,9 +1,8 @@
-import { HttpAdapterHost, NestFactory, Reflector } from '@nestjs/core';
-import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
-import { AccessGuard } from './auth/decorators';
-import { I18nValidationExceptionFilter, I18nValidationPipe } from 'nestjs-i18n';
+import { NestFactory } from '@nestjs/core';
 import { useContainer } from 'class-validator';
+import { I18nValidationExceptionFilter, I18nValidationPipe } from 'nestjs-i18n';
+import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -43,4 +42,5 @@ async function bootstrap() {
     .filter((item) => item !== undefined);
   console.log(availableRoutes);
 }
+
 bootstrap();

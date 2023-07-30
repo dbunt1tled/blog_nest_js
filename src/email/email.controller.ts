@@ -1,27 +1,23 @@
 import { Controller, Get, Inject, Param, Query } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { Observable, map } from 'rxjs';
+import { EmailService } from './email.service';
 
 @Controller('emails')
 export class EmailController {
   constructor(
-    @Inject('SUBSCRIBERS_SERVICE') private readonly service: ClientProxy,
+    private readonly emailService: EmailService,
   ) {}
 
   @Get('send/:email')
-  sendEmail(@Param('email') email: string): Observable<string> {
-    const message = this.service.send<string>(
-      { cmd: 'send' },
-      { email: email },
-    );
-    message.subscribe((result) => {
-      console.log(result);
-    });
+  async sendEmail(@Param('email') email: string): Promise<string> {
+    const message = await this.emailService.sendEmail(email);
+    console.log(message);
     return message;
   }
 
   @Get('send-event/:email')
   sendEmailEvent(@Param('email') email: string) {
-    return this.service.emit({ cmd: 'send-event' }, { email: email });
+    return this.emailService.sendEmailEvent(email);
   }
 }

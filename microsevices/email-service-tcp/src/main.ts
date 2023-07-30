@@ -5,13 +5,12 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  //const configService = app.get(ConfigService);
-
+  const configService = app.get(ConfigService);
   await app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.TCP,
     options: {
-      host: '127.0.0.1',
-      port: 3001,
+      host: configService.get<string>('HOST'),
+      port: configService.get<number>('PORT'),
     },
   });
 

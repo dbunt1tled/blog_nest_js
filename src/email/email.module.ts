@@ -9,7 +9,7 @@ import { EmailService } from './email.service';
   controllers: [EmailController],
   providers: [
     {
-      provide: 'SUBSCRIBERS_SERVICE',
+      provide: 'EMAILS_SERVICE',
       useFactory: (configService: ConfigService) =>
         ClientProxyFactory.create({
           transport: Transport.TCP,
