@@ -21,6 +21,7 @@ import { EmailModuleGRPC } from './emailGRPC/email.module';
 import { EmailModuleRabbit } from './emailRabbit/email.module';
 import { ExceptionHandler } from './handler';
 import { UserModule } from './user/user.module';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { UserModule } from './user/user.module';
     EmailModuleRabbit,
     EmailModuleGRPC,
     ChatModule,
+    HealthModule,
   ],
   controllers: [],
   providers: [
