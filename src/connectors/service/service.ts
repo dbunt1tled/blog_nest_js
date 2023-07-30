@@ -13,7 +13,6 @@ export class Service {
   ) {}
 
   async resultList<T>(data: T[], filter: Filter): Promise<T[] | Paginator<T>> {
-    console.log(filter);
     if (
       !('pagination' in filter) ||
       filter.pagination === undefined ||

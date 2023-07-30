@@ -5,21 +5,21 @@ import {
   NotFoundException,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import { SignUp } from './dto/sign-up';
-import { Auth } from './dto/auth';
-import * as argon2 from 'argon2';
-import { UserService } from '../user/user.service';
-import { Tokens } from './dto/tokens';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { jwtConstants } from './constants';
-import { UserFilter } from '../user/user.filter';
-import { uid } from 'uid';
+import * as argon2 from 'argon2';
 import { I18nContext, I18nService } from 'nestjs-i18n';
-import { TokenType } from './strategies/token.type';
-import { JwtPayload } from './strategies/jwt.payload';
-import { UserStatus } from '../user/enums/user.status';
+import { uid } from 'uid';
 import { Role } from '../user/enums/role';
+import { UserStatus } from '../user/enums/user.status';
 import { User } from '../user/models/user';
+import { UserFilter } from '../user/user.filter';
+import { UserService } from '../user/user.service';
+import { Auth } from './dto/auth';
+import { SignUp } from './dto/sign-up';
+import { Tokens } from './dto/tokens';
+import { JwtPayload } from './strategies/jwt.payload';
+import { TokenType } from './strategies/token.type';
 
 @Global()
 @Injectable()
@@ -28,6 +28,7 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
     private readonly i18n: I18nService,
+    private readonly configService: ConfigService,
   ) {}
 
   async tokens(user: User): Promise<Tokens> {
@@ -42,7 +43,7 @@ export class AuthService {
         },
         {
           expiresIn: 60 * 30,
-          secret: jwtConstants.secretAccess,
+          secret: this.configService.get('JWT_SECRET_ACCESS'),
         },
       ),
       this.jwtService.signAsync(
@@ -55,7 +56,7 @@ export class AuthService {
         },
         {
           expiresIn: 60 * 60 * 24 * 30,
-          secret: jwtConstants.secretRefresh,
+          secret: this.configService.get('JWT_SECRET_REFRESH'),
         },
       ),
     ]);
@@ -122,7 +123,7 @@ export class AuthService {
   async refresh(userId: number): Promise<Tokens> {
     let user = await this.userService.getById(userId);
     user = await this.userService.update({
-      id: userId,
+      id: user.id,
       hashRt: uid(21),
     });
     return this.tokens(user);
@@ -139,7 +140,7 @@ export class AuthService {
       },
       {
         expiresIn: '1d',
-        secret: jwtConstants.secretAccess,
+        secret: this.configService.get('JWT_SECRET_ACCESS'),
       },
     );
   }
@@ -157,7 +158,7 @@ export class AuthService {
     }
     try {
       return this.jwtService.verify(token, {
-        secret: jwtConstants.secretAccess,
+        secret: this.configService.get('JWT_SECRET_ACCESS'),
       });
     } catch (e) {
       throw new UnprocessableEntityException(
@@ -166,5 +167,27 @@ export class AuthService {
         }),
       );
     }
+  }
+
+  public async userFromAuthenticationToken(token: string) {
+    const payload = <JwtPayload>this.jwtService.verify(token, {
+      secret: this.configService.get('JWT_SECRET_ACCESS'),
+    });
+    if (payload.sub) {
+      const user = await this.userService.getById(payload.sub);
+      if (user.hashRt !== payload.session) {
+        throw new ForbiddenException(
+          this.i18n.t('app.alert.access_denied', {
+            lang: 'en'
+          }),
+        );
+      }
+      return user;
+    }
+    throw new NotFoundException(
+      this.i18n.t('app.alert.user_not_found', {
+        lang: 'en',
+      }),
+    );
   }
 }

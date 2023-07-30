@@ -1,4 +1,3 @@
-import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
@@ -12,6 +11,7 @@ import * as path from 'path';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { AccessGuard, RolesGuard } from './auth/decorators';
+import { ChatModule } from './chat/chat.module';
 import { MailModule } from './connectors/mail/mail.module';
 import { ORMModule } from './connectors/orm/o-r-m.module';
 import { PaginationQueryTransform } from './connectors/requests/pagination/pagination.query.transform';
@@ -46,6 +46,7 @@ import { UserModule } from './user/user.module';
     EmailModule,
     EmailModuleRabbit,
     EmailModuleGRPC,
+    ChatModule,
   ],
   controllers: [],
   providers: [

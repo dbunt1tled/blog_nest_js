@@ -17,6 +17,7 @@ model User {
   status      Int       @default(1)
   role        String    @db.VarChar(100)
   posts       Post[]
+  chats       Chat[]
   hash        String    @db.VarChar(200)
   hashRt      String?   @db.VarChar(200)
   confirmedAt DateTime?
@@ -29,7 +30,7 @@ model User {
 model Post {
   id        Int      @id @default(autoincrement())
   title     String   @db.VarChar(200)
-  content   String?  @db.VarChar(200)
+  content   String?  @db.Text()
   status    Int      @default(1)
   author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   authorId  Int
@@ -37,4 +38,15 @@ model Post {
   updatedAt DateTime @updatedAt
 
   @@map("posts")
+}
+
+model Chat {
+  id        Int      @id @default(autoincrement())
+  message   String   @db.Text()
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  authorId  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("chats")
 }

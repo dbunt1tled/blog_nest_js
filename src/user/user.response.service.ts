@@ -62,7 +62,6 @@ export class UserResponseService {
 
     userSerializer.relationships = relationships;
     serializer.register('user', userSerializer);
-    console.log(userData);
     return await serializer.serializeAsync('user', data);
   }
 }
