@@ -1,3 +1,4 @@
+import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
@@ -16,10 +17,10 @@ import { ORMModule } from './connectors/orm/o-r-m.module';
 import { PaginationQueryTransform } from './connectors/requests/pagination/pagination.query.transform';
 import { Service } from './connectors/service/service';
 import { EmailModule } from './email/email.module';
+import { EmailModuleGRPC } from './emailGRPC/email.module';
 import { EmailModuleRabbit } from './emailRabbit/email.module';
 import { ExceptionHandler } from './handler';
 import { UserModule } from './user/user.module';
-import { EmailModuleGRPC } from './emailGRPC/email.module';
 
 @Module({
   imports: [
