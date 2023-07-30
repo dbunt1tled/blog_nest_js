@@ -1,13 +1,6 @@
 import { Module } from '@nestjs/common';
-import { AppService } from './app.service';
-import { APP_FILTER, APP_GUARD } from '@nestjs/core';
-import { ExceptionHandler } from './handler';
-import { AuthModule } from './auth/auth.module';
-import { UserModule } from './user/user.module';
-import { ORMModule } from './connectors/orm/o-r-m.module';
-import { AccessGuard, RolesGuard } from './auth/decorators';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { MailModule } from './connectors/mail/mail.module';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import {
   AcceptLanguageResolver,
   HeaderResolver,
@@ -15,9 +8,18 @@ import {
   QueryResolver,
 } from 'nestjs-i18n';
 import * as path from 'path';
+import { AppService } from './app.service';
+import { AuthModule } from './auth/auth.module';
+import { AccessGuard, RolesGuard } from './auth/decorators';
+import { MailModule } from './connectors/mail/mail.module';
+import { ORMModule } from './connectors/orm/o-r-m.module';
 import { PaginationQueryTransform } from './connectors/requests/pagination/pagination.query.transform';
 import { Service } from './connectors/service/service';
 import { EmailModule } from './email/email.module';
+import { EmailModuleRabbit } from './emailRabbit/email.module';
+import { ExceptionHandler } from './handler';
+import { UserModule } from './user/user.module';
+import { EmailModuleGRPC } from './emailGRPC/email.module';
 
 @Module({
   imports: [
@@ -35,12 +37,14 @@ import { EmailModule } from './email/email.module';
         watch: true,
       },
       resolvers: [
-        new QueryResolver(["lang", "l"]),
-        new HeaderResolver(["x-custom-lang"]),
+        new QueryResolver(['lang', 'l']),
+        new HeaderResolver(['x-custom-lang']),
         AcceptLanguageResolver,
       ],
     }),
     EmailModule,
+    EmailModuleRabbit,
+    EmailModuleGRPC,
   ],
   controllers: [],
   providers: [
