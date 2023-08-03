@@ -26,7 +26,7 @@ async function bootstrap() {
 
   await app.listen(3000);
   const server = app.getHttpServer();
-  // const router = server._events.request._router;
+  //const router = server._events.request._router;
   //
   // const availableRoutes: [] = router.stack
   //   .map((layer) => {

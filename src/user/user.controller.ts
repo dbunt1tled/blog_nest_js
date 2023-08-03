@@ -1,3 +1,4 @@
+import { CacheInterceptor, CacheKey } from '@nestjs/cache-manager';
 import {
   Body,
   Controller,
@@ -9,26 +10,26 @@ import {
   Post,
   Put,
   Query,
-  Res, UseInterceptors
+  Res,
+  UseInterceptors,
 } from '@nestjs/common';
+import * as argon2 from 'argon2';
 import { Response } from 'express';
-import { UserService } from './user.service';
 import { I18nContext, I18nService } from 'nestjs-i18n';
 import { MailService } from '../connectors/mail/mail.service';
-import { UserCreateRequest } from './requests/user.create.request';
+import { IncludeQuery, PaginationQuery } from '../connectors/requests';
+import { Pagination } from '../connectors/requests/pagination/pagination';
+import { PaginationQueryTransform } from '../connectors/requests/pagination/pagination.query.transform';
 import { UserCreate } from './dto/user.create';
-import * as argon2 from 'argon2';
-import { UserUpdateRequest } from './requests/user.update.request';
+import { UFilter } from './dto/user.filter';
 import { UserUpdate } from './dto/user.update';
 import { UserStatus } from './enums/user.status';
-import { UFilter } from './dto/user.filter';
+import { UserCreateRequest } from './requests/user.create.request';
 import { UserListQuery } from './requests/user.list.query';
+import { UserUpdateRequest } from './requests/user.update.request';
 import { UserFilter } from './user.filter';
 import { UserResponseService } from './user.response.service';
-import { IncludeQuery, PaginationQuery } from '../connectors/requests';
-import { PaginationQueryTransform } from '../connectors/requests/pagination/pagination.query.transform';
-import { Pagination } from '../connectors/requests/pagination/pagination';
-import { CacheInterceptor, CacheKey } from '@nestjs/cache-manager';
+import { UserService } from './user.service';
 
 @Controller('users')
 export class UserController {
