@@ -3,6 +3,7 @@ import {
   IsArray,
   IsEmail,
   IsEnum,
+  IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
@@ -10,29 +11,22 @@ import {
 } from 'class-validator';
 import { PaginationQuery } from '../../connectors/requests';
 import { PaginationRequest } from '../../connectors/requests/pagination/pagination.request';
-import { isDBUnique } from '../decorators';
-import { Role } from '../enums/role';
-import { UserStatus } from '../enums/user.status';
+import { PostStatus } from '../enum/post.status';
 
 class Filter {
   @IsOptional()
-  @IsEmail({}, { message: 'validation.INVALID_EMAIL' })
-  @isDBUnique('user', 'email')
-  emailSearch?: string;
-  @IsOptional()
   @IsString()
-  nameSearch?: string;
+  titleSearch?: string;
+  @IsOptional()
+  @IsNumber()
+  authorId?: number;
   @IsOptional()
   @IsArray()
-  @IsEnum(UserStatus, { each: true })
-  status?: UserStatus;
-  @IsOptional()
-  @IsArray()
-  @IsEnum(Role, { each: true })
-  role?: Role[];
+  @IsEnum(PostStatus, { each: true })
+  status?: PostStatus;
 }
 
-export class UserListQuery implements PaginationRequest {
+export class PostListQuery implements PaginationRequest {
   @ValidateNested()
   @Type(() => Filter)
   filter: Filter;

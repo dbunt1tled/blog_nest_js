@@ -18,6 +18,11 @@
         "include": "../src/proto",
         "outDir": "dist/src/proto",
         "watchAssets": true
+      },
+      {
+        "include": "../storage",
+        "outDir": "dist/storage",
+        "watchAssets": true
       }
     ],
     "watchAssets": true

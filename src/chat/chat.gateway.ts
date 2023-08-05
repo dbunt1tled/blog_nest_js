@@ -59,7 +59,7 @@ export class ChatGateway
   }
 
   afterInit(server: Server) {
-    console.log(server);
+    console.log('init Sockets');
   }
 
   handleDisconnect(client: Socket) {

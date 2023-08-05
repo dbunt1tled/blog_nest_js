@@ -30,7 +30,7 @@ export class ExceptionHandler extends BaseExceptionFilter {
     }
     const debug =
       exception instanceof Error
-        ? { file: exception.stack.split('\n')[1].trim() }
+        ? { file: exception.stack.split('\n')[1]?.trim() }
         : {};
     const responseBody = {
       ...(response as NonNullable<unknown>),

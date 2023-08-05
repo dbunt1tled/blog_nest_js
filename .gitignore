@@ -38,3 +38,4 @@ lerna-debug.log*
 .env
 rest.http
 http-client.env.json
+/storage/*

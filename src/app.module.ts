@@ -1,6 +1,9 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
+import { MulterModule } from '@nestjs/platform-express';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { diskStorage } from 'multer';
 import {
   AcceptLanguageResolver,
   HeaderResolver,
@@ -8,6 +11,8 @@ import {
   QueryResolver,
 } from 'nestjs-i18n';
 import * as path from 'path';
+import { extname } from 'path';
+import { v4 as uuid } from 'uuid';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { AccessGuard, RolesGuard } from './auth/decorators';
@@ -20,16 +25,36 @@ import { EmailModule } from './email/email.module';
 import { EmailModuleGRPC } from './emailGRPC/email.module';
 import { EmailModuleRabbit } from './emailRabbit/email.module';
 import { ExceptionHandler } from './handler';
-import { UserModule } from './user/user.module';
 import { HealthModule } from './health/health.module';
+import { PostModule } from './post/post.module';
+import { UserModule } from './user/user.module';
 
+@Global()
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    ServeStaticModule.forRoot({
+      rootPath: path.join(__dirname, '..', 'storage', 'public'),
+      renderPath: '/storage/public',
+      serveRoot: '/public/',
+    }),
+    MulterModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        storage: diskStorage({
+          destination: configService.get<string>('MULTER_DEST'),
+          filename: (req, file, cb) => {
+            return cb(null, `${uuid()}${extname(file.originalname)}`);
+          },
+        }),
+      }),
+      inject: [ConfigService],
+    }),
     AuthModule,
     UserModule,
+    PostModule,
     ORMModule,
     MailModule,
     I18nModule.forRoot({
