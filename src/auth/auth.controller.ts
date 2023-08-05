@@ -19,8 +19,6 @@ import {
   CurrentUserId,
   Public,
   RefreshGuard,
-  Roles,
-  RolesGuard,
 } from './decorators';
 import { UserService } from '../user/user.service';
 import { UserStatus } from '../user/enums/user.status';
@@ -29,7 +27,9 @@ import { MailService } from '../connectors/mail/mail.service';
 import { EmailConfirmResend } from './dto/emailConfirmResend';
 import { UserFilter } from '../user/user.filter';
 import { Role } from '../user/enums/role';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(

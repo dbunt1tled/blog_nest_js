@@ -17,7 +17,7 @@ import * as argon2 from 'argon2';
 import { Response } from 'express';
 import { I18nContext, I18nService } from 'nestjs-i18n';
 import { MailService } from '../connectors/mail/mail.service';
-import { IncludeQuery, PaginationQuery } from '../connectors/requests';
+import { IncludeQuery } from '../connectors/requests';
 import { Pagination } from '../connectors/requests/pagination/pagination';
 import { PaginationQueryTransform } from '../connectors/requests/pagination/pagination.query.transform';
 import { UserCreate } from './dto/user.create';

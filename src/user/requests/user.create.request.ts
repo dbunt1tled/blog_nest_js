@@ -40,6 +40,7 @@ export class UserCreateRequest {
   @ApiProperty({
     example: 1,
     description: 'User status',
+    enum: UserStatus,
   })
   status: UserStatus;
   @IsNotEmpty({ message: 'validation.NOT_EMPTY' })
