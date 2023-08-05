@@ -1,5 +1,3 @@
-import { isPaginator } from '../../connectors/helpers/helper';
-import { Paginator } from '../../connectors/requests/pagination/paginator';
 import { User } from '../models/user';
 
 const userSerializer = {

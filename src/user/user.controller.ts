@@ -11,9 +11,8 @@ import {
   Put,
   Query,
   Res,
-  UseInterceptors,
 } from '@nestjs/common';
-import {ApiParam, ApiResponse, ApiTags} from '@nestjs/swagger';
+import { ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import * as argon2 from 'argon2';
 import { Response } from 'express';
 import { I18nContext, I18nService } from 'nestjs-i18n';
