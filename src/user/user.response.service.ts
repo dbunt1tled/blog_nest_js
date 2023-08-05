@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { isArray } from 'class-validator';
 import JSONAPISerializer from 'json-api-serializer';
+import { isEntity, isPaginator } from '../connectors/helpers/helper';
 import { IncludeQuery } from '../connectors/requests';
 import { Paginator } from '../connectors/requests/pagination/paginator';
 import { Post } from '../post/models/post';
@@ -40,7 +41,7 @@ export class UserResponseService {
               }),
             );
           }
-        } else if ('data' in userData) {
+        } else if (isPaginator(userData)) {
           for (const element of userData.data) {
             element.post = <Post[]>await this.postService.list(
               new PostFilter({
@@ -49,7 +50,7 @@ export class UserResponseService {
             );
           }
           data = userData.data;
-        } else {
+        } else if (isEntity(userData)) {
           userData.post = <Post[]>await this.postService.list(
             new PostFilter({
               authorId: userData.id,
@@ -61,7 +62,16 @@ export class UserResponseService {
     }
 
     userSerializer.relationships = relationships;
+    userSerializer.topLevelMeta = isPaginator(userData)
+      ? {
+          total: userData.total,
+          currentPage: userData.page,
+          perPage: userData.perPage,
+          totalPages: userData.totalPage,
+        }
+      : {};
     serializer.register('user', userSerializer);
+
     return await serializer.serializeAsync('user', data);
   }
 }

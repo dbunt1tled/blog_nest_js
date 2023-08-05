@@ -1,15 +1,9 @@
 import { Post } from '../models/post';
+import {isPaginator} from '../../connectors/helpers/helper';
 
 const postSerializer = {
   id: 'id',
-  topLevelMeta: function (data, extraData) {
-    return {
-      total: data.total,
-      currentPage: extraData.currentPage,
-      perPage: extraData.perPage,
-      totalPages: extraData.totalPages,
-    };
-  },
+  topLevelMeta: {},
   links: {
     self: function (data: Post) {
       return '/posts/' + data.id;

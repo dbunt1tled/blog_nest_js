@@ -1,7 +1,8 @@
-import { PostStatus } from '../enum/post.status';
+import { Entity } from '../../connectors/interfaces/entity';
 import { User } from '../../user/models/user';
+import { PostStatus } from '../enum/post.status';
 
-export interface Post {
+export interface Post extends Entity {
   id?: number;
   title: string;
   status: PostStatus;

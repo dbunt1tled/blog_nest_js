@@ -1,8 +1,9 @@
-import { UserStatus } from '../enums/user.status';
-import { Role } from '../enums/role';
+import { Entity } from '../../connectors/interfaces/entity';
 import { Post } from '../../post/models/post';
+import { Role } from '../enums/role';
+import { UserStatus } from '../enums/user.status';
 
-export interface User {
+export interface User extends Entity {
   id?: number;
   status: UserStatus;
   email: string;

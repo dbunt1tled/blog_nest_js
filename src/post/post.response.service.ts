@@ -7,6 +7,7 @@ import userSerializer from '../user/serializers/user.serializer';
 import { UserService } from '../user/user.service';
 import { Post } from './models/post';
 import postSerializer from './serializers/post.serializer';
+import {isEntity, isPaginator} from '../connectors/helpers/helper';
 
 @Injectable()
 export class PostResponseService {
@@ -34,12 +35,12 @@ export class PostResponseService {
           for (const element of postData) {
             element.author = await this.userService.getById(element.authorId);
           }
-        } else if ('data' in postData) {
+        } else if (isPaginator(postData)) {
           for (const element of postData.data) {
             element.author = await this.userService.getById(element.authorId);
           }
           data = postData.data;
-        } else {
+        } else if (isEntity(postData)){
           postData.author = await this.userService.getById(postData.authorId);
         }
         serializer.register('user', userSerializer);
@@ -47,7 +48,14 @@ export class PostResponseService {
     }
 
     postSerializer.relationships = relationships;
-    console.log(postSerializer);
+    postSerializer.topLevelMeta = isPaginator(postData)
+        ? {
+          total: postData.total,
+          currentPage: postData.page,
+          perPage: postData.perPage,
+          totalPages: postData.totalPage,
+        }
+        : {};
     serializer.register('post', postSerializer);
     return await serializer.serializeAsync('post', data);
   }

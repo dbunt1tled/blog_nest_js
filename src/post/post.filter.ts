@@ -14,12 +14,12 @@ export class PostFilter extends Filter {
 
   build(limit: number | undefined = undefined): FilterCondition {
     let titleFilter = undefined;
-    if (this.filter.titleSearch !== undefined) {
+    if (this.filter?.titleSearch !== undefined) {
       titleFilter = { contains: this.filter.titleSearch };
     }
 
     let statusFilter = undefined;
-    if (this.filter.status !== undefined) {
+    if (this.filter?.status !== undefined) {
       if (isArray(this.filter.status)) {
         statusFilter = { in: this.filter.status };
       } else {
@@ -28,7 +28,7 @@ export class PostFilter extends Filter {
     }
 
     let idFilter = undefined;
-    if (this.filter.id !== undefined) {
+    if (this.filter?.id !== undefined) {
       if (isArray(this.filter.id)) {
         idFilter = { in: this.filter.id };
       } else {
@@ -37,7 +37,7 @@ export class PostFilter extends Filter {
     }
 
     let authorIdFilter = undefined;
-    if (this.filter.authorId !== undefined) {
+    if (this.filter?.authorId !== undefined) {
       if (isArray(this.filter.authorId)) {
         authorIdFilter = { in: this.filter.authorId };
       } else {

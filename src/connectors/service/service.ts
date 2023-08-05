@@ -31,6 +31,7 @@ export class Service {
       page: filter.pagination.page,
       perPage: filter.pagination.limit,
       totalPage: count === 0 ? 1 : Math.ceil(count / filter.pagination.limit),
+      interface: 'Paginator'
     };
   }
 }

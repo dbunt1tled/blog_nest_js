@@ -1,21 +1,11 @@
-import { User } from '../models/user';
+import { isPaginator } from '../../connectors/helpers/helper';
 import { Paginator } from '../../connectors/requests/pagination/paginator';
+import { User } from '../models/user';
 
 const userSerializer = {
   id: 'id',
   blacklist: ['hashRt', 'hash'],
-  topLevelMeta: function (data) {
-    if ('data' in data) {
-      const paginator = <Paginator<User>>data.data;
-      return {
-        total: paginator.total,
-        currentPage: paginator.page,
-        perPage: paginator.perPage,
-        totalPages: paginator.totalPage,
-      };
-    }
-    return {};
-  },
+  topLevelMeta: {},
   links: {
     self: function (data: User) {
       return `/users` + (data.id !== undefined ? `/${data.id}` : '');

@@ -17,21 +17,21 @@ export class UserFilter extends Filter{
     let skip = undefined;
     let orderBy = undefined;
     let nameFilter = undefined;
-    if (this.filter.name !== undefined) {
+    if (this.filter?.name !== undefined) {
       nameFilter = this.filter.name;
     } else if (this.filter.nameSearch !== null) {
       nameFilter = { contains: this.filter.nameSearch };
     }
 
     let emailFilter = undefined;
-    if (this.filter.email !== undefined) {
+    if (this.filter?.email !== undefined) {
       emailFilter = this.filter.email;
     } else if (this.filter.emailSearch !== null) {
       emailFilter = { contains: this.filter.emailSearch };
     }
 
     let roleFilter = undefined;
-    if (this.filter.role !== undefined) {
+    if (this.filter?.role !== undefined) {
       if (isArray(this.filter.role)) {
         roleFilter = { in: this.filter.role };
       } else {
@@ -40,7 +40,7 @@ export class UserFilter extends Filter{
     }
 
     let statusFilter = undefined;
-    if (this.filter.status !== undefined) {
+    if (this.filter?.status !== undefined) {
       if (isArray(this.filter.status)) {
         statusFilter = { in: this.filter.status };
       } else {
@@ -49,7 +49,7 @@ export class UserFilter extends Filter{
     }
 
     let idFilter = undefined;
-    if (this.filter.id !== undefined) {
+    if (this.filter?.id !== undefined) {
       if (isArray(this.filter.id)) {
         idFilter = { in: this.filter.id };
       } else {
