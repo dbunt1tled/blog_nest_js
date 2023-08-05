@@ -107,7 +107,7 @@ export class UserController {
       id: user.id,
       status: UserStatus.DELETED,
     });
-    res.status(HttpStatus.NO_CONTENT).json().send();
+    res.status(HttpStatus.NO_CONTENT).send();
   }
 
   @Get(':id')

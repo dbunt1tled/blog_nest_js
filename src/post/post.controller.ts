@@ -136,7 +136,7 @@ export class PostController {
       id: post.id,
       status: PostStatus.DELETED,
     });
-    res.status(HttpStatus.NO_CONTENT).json().send();
+    res.status(HttpStatus.NO_CONTENT).send();
   }
 
   @Get(':id')
