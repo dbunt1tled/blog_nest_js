@@ -13,6 +13,7 @@ import {
   Res,
   UseInterceptors,
 } from '@nestjs/common';
+import {ApiParam, ApiResponse, ApiTags} from '@nestjs/swagger';
 import * as argon2 from 'argon2';
 import { Response } from 'express';
 import { I18nContext, I18nService } from 'nestjs-i18n';
@@ -32,6 +33,7 @@ import { UserResponseService } from './user.response.service';
 import { UserService } from './user.service';
 
 @Controller('users')
+@ApiTags('users')
 export class UserController {
   constructor(
     private readonly i18n: I18nService,
@@ -42,7 +44,8 @@ export class UserController {
 
   @Get('')
   async list(
-    @Query() query: UserListQuery,
+    @Query()
+    query: UserListQuery,
     @Query('', PaginationQueryTransform) pagination: Pagination,
     @Res() res: Response,
   ): Promise<void> {
@@ -73,7 +76,8 @@ export class UserController {
 
   @Put(':id')
   async update(
-    @Param('id') id: number,
+    @Param('id')
+    id: number,
     @Query() query: IncludeQuery,
     @Body() req: UserUpdateRequest,
     @Res() res: Response,

@@ -1,5 +1,6 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { useContainer } from 'class-validator';
 import { I18nValidationExceptionFilter, I18nValidationPipe } from 'nestjs-i18n';
 import { AppModule } from './app.module';
@@ -23,6 +24,15 @@ async function bootstrap() {
       detailedErrors: false,
     }),
   );
+
+  const config = new DocumentBuilder()
+    .setTitle('Blog')
+    .setDescription('The blog API description')
+    .setVersion('1.0')
+    .addTag('blog')
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
 
   await app.listen(3000);
   const server = app.getHttpServer();
